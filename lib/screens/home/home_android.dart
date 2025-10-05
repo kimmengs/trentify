@@ -8,7 +8,15 @@ class TrendifyHomeMaterial extends StatefulWidget {
 }
 
 class _TrendifyHomeMaterialState extends State<TrendifyHomeMaterial> {
-  final List<String> _tabs = const ['Discover', 'Women', 'Men', 'Shoe'];
+  final List<String> _tabs = const [
+    'Discover',
+    'Women',
+    'Men',
+    'Shoe',
+    'Bag',
+    'Luxury',
+    'Kids',
+  ];
   int _selectedTab = 0;
 
   @override

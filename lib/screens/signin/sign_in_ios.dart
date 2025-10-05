@@ -2,7 +2,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:trentify/widgets/input_widget.dart';
 
 class SignInPageCupertino extends StatefulWidget {
   const SignInPageCupertino({super.key});
@@ -14,24 +13,18 @@ class SignInPageCupertino extends StatefulWidget {
 class _SignInPageCupertinoState extends State<SignInPageCupertino> {
   final _emailCtl = TextEditingController();
   final _pwdCtl = TextEditingController();
+  final _emailNode = FocusNode();
+  final _pwdNode = FocusNode();
+
   bool _obscure = true;
   bool _loading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
-  }
 
   @override
   void dispose() {
     _emailCtl.dispose();
     _pwdCtl.dispose();
+    _emailNode.dispose();
+    _pwdNode.dispose();
     super.dispose();
   }
 
@@ -50,164 +43,244 @@ class _SignInPageCupertinoState extends State<SignInPageCupertino> {
   }
 
   Future<void> _signIn() async {
-    FocusManager.instance.primaryFocus?.unfocus();
-    final emailErr = _validateEmail(_emailCtl.text);
-    final pwdErr = _validatePassword(_pwdCtl.text);
-    if (emailErr != null || pwdErr != null) {
-      // light inline feedback is enough; you can keep your dialog if you prefer
-      return;
-    }
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 900));
+    // Dismiss keyboard
+    _emailNode.unfocus();
+    _pwdNode.unfocus();
+
+    // Simple inline validation (replace with your auth flow)
+    // final emailErr = _validateEmail(_emailCtl.text);
+    // final pwdErr = _validatePassword(_pwdCtl.text);
+    // if (emailErr != null || pwdErr != null) {
+    //   _showCupertinoAlert([emailErr, pwdErr].whereType<String>().join('\n'));
+    //   return;
+    // }
+
+    // setState(() => _loading = true);
+    // await Future.delayed(const Duration(milliseconds: 900));
+    // if (!mounted) return;
+    // setState(() => _loading = false);
+
     if (!mounted) return;
-    setState(() => _loading = false);
     context.go('/home');
+  }
+
+  void _showCupertinoAlert(String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Check your input'),
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final safe = MediaQuery.of(context).padding;
+    final theme = CupertinoTheme.of(context);
+
+    // Set iOS-style status bar (optional)
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarColor: CupertinoColors.systemBackground,
+      ),
+    );
 
     return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.systemGroupedBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       navigationBar: const CupertinoNavigationBar(
-        backgroundColor: CupertinoColors.systemGroupedBackground,
-        border: null,
-        middle: Text('Login'),
+        middle: Text('Login to Your Account'),
+        transitionBetweenRoutes: false,
       ),
       child: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: EdgeInsets.fromLTRB(20, 12, 20, 16 + safe.bottom),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 24),
-              Center(
-                child: Container(
-                  width: 96,
-                  height: 96,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        CupertinoColors.activeBlue,
-                        CupertinoColors.systemBlue,
-                      ],
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    CupertinoIcons.circle_grid_3x3_fill,
-                    color: CupertinoColors.white,
-                    size: 40,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 28),
-              const Text(
-                'Login to Your Account',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 24),
-
-              InputWidget(
-                controller: _emailCtl,
-                placeholder: 'Email',
-                keyboardType: TextInputType.emailAddress,
-                prefix: const Icon(
-                  CupertinoIcons.envelope_fill,
-                  size: 18,
-                  color: CupertinoColors.systemGrey,
-                ),
-                validator: _validateEmail,
-                textInputAction: TextInputAction.next,
-                onSubmitted: (_) => FocusScope.of(context).nextFocus(),
-              ),
-              const SizedBox(height: 14),
-
-              InputWidget(
-                controller: _pwdCtl,
-                placeholder: 'Password',
-                obscureText: _obscure,
-                prefix: const Icon(
-                  CupertinoIcons.lock_fill,
-                  size: 18,
-                  color: CupertinoColors.systemGrey,
-                ),
-                suffix: CupertinoButton(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: const Size(0, 0),
-                  onPressed: () => setState(() => _obscure = !_obscure),
-                  child: Icon(
-                    _obscure
-                        ? CupertinoIcons.eye_slash_fill
-                        : CupertinoIcons.eye_fill,
-                    size: 20,
-                    color: CupertinoColors.systemGrey2,
-                  ),
-                ),
-                validator: _validatePassword,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _signIn(),
-              ),
-
-              const SizedBox(height: 18),
-              CupertinoButton.filled(
-                borderRadius: BorderRadius.circular(20),
-                onPressed: _loading ? null : _signIn,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: _loading
-                    ? const CupertinoActivityIndicator()
-                    : const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {},
-                  child: const Text(
-                    'Forgot Password?',
-                    style: TextStyle(
+        child: CupertinoScrollbar(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 12),
+                Center(
+                  child: Container(
+                    height: 96,
+                    width: 96,
+                    decoration: const BoxDecoration(
                       color: CupertinoColors.activeBlue,
-                      fontWeight: FontWeight.w600,
+                      shape: BoxShape.circle,
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Don\'t have an account? ',
-                    style: TextStyle(color: CupertinoColors.inactiveGray),
-                  ),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => context.go('/signup'),
-                    child: const Text(
-                      'Sign up',
-                      style: TextStyle(
-                        color: CupertinoColors.activeBlue,
-                        fontWeight: FontWeight.w600,
+                    child: const Center(
+                      child: Icon(
+                        CupertinoIcons.square_grid_2x2,
+                        size: 36,
+                        color: CupertinoColors.white,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 28),
+
+                // Email
+                _LabeledField(
+                  label: 'Email',
+                  child: CupertinoTextField(
+                    controller: _emailCtl,
+                    focusNode: _emailNode,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    placeholder: 'you@example.com',
+                    clearButtonMode: OverlayVisibilityMode.editing,
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(left: 12),
+                      child: Icon(CupertinoIcons.envelope_open),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 12,
+                    ),
+                    onSubmitted: (_) => _pwdNode.requestFocus(),
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                // Password
+                _LabeledField(
+                  label: 'Password',
+                  child: CupertinoTextField(
+                    controller: _pwdCtl,
+                    focusNode: _pwdNode,
+                    obscureText: _obscure,
+                    textInputAction: TextInputAction.done,
+                    placeholder: '••••••••',
+                    clearButtonMode: OverlayVisibilityMode.never,
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(left: 12),
+                      child: Icon(CupertinoIcons.lock),
+                    ),
+                    suffix: CupertinoButton(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      minSize: 0,
+                      onPressed: () => setState(() => _obscure = !_obscure),
+                      child: Icon(
+                        _obscure
+                            ? CupertinoIcons.eye_slash
+                            : CupertinoIcons.eye,
+                        size: 20,
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 12,
+                    ),
+                    onSubmitted: (_) => _signIn(),
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                // Sign in button
+                CupertinoButton.filled(
+                  onPressed: _loading ? null : _signIn,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: _loading
+                      ? const CupertinoActivityIndicator()
+                      : const Text('Sign in'),
+                ),
+
+                const SizedBox(height: 10),
+
+                // Forgot password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      // TODO: navigate to forgot page
+                    },
+                    child: const Text('Forgot Password?'),
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                // Sign up row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Don\'t have an account? '),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => context.go('/signup'),
+                      child: const Text('Sign up'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Small helper to mimic Material's "labelText" feel in Cupertino land.
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+      fontSize: 13,
+      color: CupertinoColors.inactiveGray,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: labelStyle),
+        const SizedBox(height: 6),
+        _CupertinoFieldContainer(child: child),
+      ],
+    );
+  }
+}
+
+/// Rounded container with iOS field look (thin border, subtle background).
+class _CupertinoFieldContainer extends StatelessWidget {
+  const _CupertinoFieldContainer({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = CupertinoDynamicColor.resolve(
+      CupertinoColors.secondarySystemBackground,
+      context,
+    );
+    final border = CupertinoDynamicColor.resolve(
+      CupertinoColors.separator,
+      context,
+    );
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: border.withOpacity(0.6), width: 0.8),
+      ),
+      child: child,
     );
   }
 }
