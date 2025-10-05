@@ -3,6 +3,5 @@ class AppRoutes {
   static const signIn = '/signin';
   static const signUp = '/signup';
   static const home = '/home';
-  static const qrScan = '/qrscan';
-  static const send = '/send';
+  static const category = '/category/:name';
 }

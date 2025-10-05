@@ -2,7 +2,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:trentify/model/product.dart';
 import 'package:trentify/screens/home/widget/category_pill_widget.dart';
+import 'package:trentify/screens/home/widget/product_card_widget.dart';
 import 'package:trentify/screens/home/widget/search_fill_widget.dart';
 
 class TrendifyHomeCupertino extends StatefulWidget {
@@ -298,74 +301,79 @@ class _CategoryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     const double bannerHeight = 90;
 
-    return SizedBox(
-      height: bannerHeight,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: const Color(
-                  0xFFF5F5F5,
-                ), // light gray (softer and cleaner)
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x33000000), // subtle black with 20% opacity
-                    blurRadius: 8, // how soft the shadow looks
-                    offset: Offset(0, 3), // vertical movement
-                  ),
-                ],
-                borderRadius: BorderRadius.all(
-                  Radius.circular(16),
-                ), // optional: soft corners
-              ),
-            ),
-            // Text
-            Positioned.fill(
-              left: 5,
-              top: 5,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 5, left: 5),
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: CupertinoColors.black,
-                  ),
+    return InkWell(
+      onTap: () {
+        context.pushNamed('category', pathParameters: {'name': title});
+      },
+      child: SizedBox(
+        height: bannerHeight,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: const Color(
+                    0xFFF5F5F5,
+                  ), // light gray (softer and cleaner)
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x33000000), // subtle black with 20% opacity
+                      blurRadius: 8, // how soft the shadow looks
+                      offset: Offset(0, 3), // vertical movement
+                    ),
+                  ],
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(16),
+                  ), // optional: soft corners
                 ),
               ),
-            ),
-
-            // Image pinned to right, sized to banner height
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Image.asset(
-                imagePathOrUrl!,
-                height: bannerHeight,
-                fit: BoxFit.fitHeight,
-              ),
-            ),
-            Positioned.fill(
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.05),
-                      ],
+              // Text
+              Positioned.fill(
+                left: 5,
+                top: 5,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 5, left: 5),
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: CupertinoColors.black,
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+
+              // Image pinned to right, sized to banner height
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Image.asset(
+                  imagePathOrUrl!,
+                  height: bannerHeight,
+                  fit: BoxFit.fitHeight,
+                ),
+              ),
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.05),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -497,203 +505,8 @@ class _HorizontalProducts extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: products.length,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, index) => _ProductCard(product: products[index]),
-      ),
-    );
-  }
-}
-
-class _ProductCard extends StatelessWidget {
-  final Product product;
-  const _ProductCard({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    final cardBg = CupertinoDynamicColor.resolve(
-      CupertinoColors.systemBackground,
-      context,
-    );
-    const tileBg = Color(0xFFF1F2F4); // subtle light gray like the mock
-    const priceColor = CupertinoColors.activeGreen;
-
-    return SizedBox(
-      width: 160,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // IMAGE TILE
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                color: tileBg, // background behind transparent images
-              ),
-              child: Stack(
-                children: [
-                  // 3:4 image, fills tile, top-centered
-                  AspectRatio(
-                    aspectRatio: 3 / 4,
-                    child: _buildProductImage(product.imageUrl),
-                  ),
-                  // rating chip (top-left)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: _RatingChip(rating: product.rating),
-                  ),
-
-                  // favorite circular button (top-right, dark)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: _DarkCircle(
-                      child: CupertinoButton(
-                        padding: const EdgeInsets.all(6),
-                        minSize: 0,
-                        onPressed: () {},
-                        child: const Icon(
-                          CupertinoIcons.heart,
-                          size: 18,
-                          color: CupertinoColors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          // Title
-          Text(
-            product.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-          ),
-          const SizedBox(height: 6),
-
-          // Price (green)
-          const SizedBox(height: 2),
-          const SizedBox.shrink(),
-          Text(
-            '\$${product.price.toStringAsFixed(2)}',
-            style: const TextStyle(
-              color: priceColor,
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-Widget _buildProductImage(String pathOrUrl) {
-  final isNetwork = pathOrUrl.startsWith('http');
-  if (isNetwork) {
-    return CachedNetworkImage(
-      imageUrl: pathOrUrl,
-      fit: BoxFit.cover,
-      alignment: Alignment.topCenter,
-      placeholder: (_, __) => const _ImagePlaceholder(),
-      errorWidget: (_, __, ___) => const _ImagePlaceholder(),
-    );
-  } else {
-    // Asset
-    return Image.asset(
-      pathOrUrl,
-      fit: BoxFit.cover,
-      alignment: Alignment.topCenter,
-      errorBuilder: (_, __, ___) => const _ImagePlaceholder(),
-    );
-  }
-}
-
-class _ImagePlaceholder extends StatelessWidget {
-  const _ImagePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFFF1F2F4),
-      alignment: Alignment.center,
-      child: const Icon(
-        CupertinoIcons.photo,
-        size: 38,
-        color: CupertinoColors.systemGrey3,
-      ),
-    );
-  }
-}
-
-class _DarkCircle extends StatelessWidget {
-  final Widget child;
-  const _DarkCircle({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: const Color(0xCC000000), // black w/ opacity for the mock look
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x26000000),
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(child: child),
-    );
-  }
-}
-
-class _RatingChip extends StatelessWidget {
-  final double rating;
-  const _RatingChip({required this.rating});
-
-  @override
-  Widget build(BuildContext context) {
-    final chipBg = CupertinoDynamicColor.resolve(
-      CupertinoColors.systemBackground,
-      context,
-    );
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: chipBg,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x1A000000),
-            blurRadius: 3,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              CupertinoIcons.star_fill,
-              size: 12,
-              color: CupertinoColors.systemYellow,
-            ),
-            const SizedBox(width: 2),
-            Text(
-              rating.toStringAsFixed(1),
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-            ),
-          ],
-        ),
+        itemBuilder: (context, index) =>
+            ProductCardWidget(product: products[index]),
       ),
     );
   }
@@ -746,20 +559,6 @@ class _CircleGlyph extends StatelessWidget {
 }
 
 // ======= DEMO DATA (Cupertino Icons) =======
-
-class Product {
-  final String title;
-  final double price;
-  final double rating;
-  final String imageUrl;
-
-  const Product({
-    required this.title,
-    required this.price,
-    required this.rating,
-    required this.imageUrl,
-  });
-}
 
 class CategoryItem {
   final String title;
