@@ -1,0 +1,76 @@
+# Flutter/Dart/Pub related
+**/doc/api/
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+flutter_*.png
+
+# Android related
+*.apk
+*.aar
+*.ap_
+*.aab
+local.properties
+GeneratedPluginRegistrant.java
+
+# iOS/Xcode related
+**/DerivedData/
+**/Pods/
+**/.symlinks/
+**/flutter/Flutter.framework/
+**/flutter/Flutter.podspec
+**/flutter/Generated.xcconfig
+**/flutter/app.flx
+**/flutter/app.zip
+**/flutter/flutter_assets/
+**/flutter/ephemeral/
+**/ServiceDefinitions.json
+xcuserdata/
+*.xcuserstate
+*.moved-aside
+*.xcworkspace
+!default.xcworkspace
+
+# macOS
+**/Flutter/ephemeral/
+**/Pods/
+**/xcuserdata/
+
+# Windows
+**/x64/
+**/x86/
+**/Debug/
+**/Release/
+**/windows/flutter/ephemeral/
+
+# Linux
+**/linux/flutter/ephemeral/
+
+# Web
+lib/generated_plugin_registrant.dart
+
+# Coverage
+coverage/
+
+# Symbolication
+app.*.symbols
+
+# VS Code related
+.vscode/
+
+# IntelliJ related
+*.iml
+.idea/
+
+# Misc
+*.log
+*.tmp
+*.swp
+*.lock
+
+web/
+linux/
+macos/
+windows/
