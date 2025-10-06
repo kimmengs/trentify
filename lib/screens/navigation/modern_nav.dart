@@ -24,8 +24,8 @@ class ModernBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final tint = isDark
-        ? Colors.white.withOpacity(0.08) // darker mode = lighter tint
-        : Colors.white.withOpacity(0.18); // light mode = faint milk
+        ? Colors.white.withValues(alpha: 0.08) // darker mode = lighter tint
+        : Colors.white.withValues(alpha: 0.18); // light mode = faint milk
 
     return SafeArea(
       top: false,
@@ -35,7 +35,6 @@ class ModernBottomBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           child: Stack(
             children: [
-              // 1) blur what's BEHIND the bar
               Positioned.fill(
                 child: ClipRect(
                   child: BackdropFilter(
@@ -44,14 +43,13 @@ class ModernBottomBar extends StatelessWidget {
                   ),
                 ),
               ),
-              // 2) translucent tint + border + shadow (no solid white!)
               Container(
                 height: 72,
                 decoration: BoxDecoration(
                   color: tint,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.35),
+                    color: Colors.white.withValues(alpha: 0.35),
                     width: 1,
                   ),
                   boxShadow: const [
@@ -98,8 +96,11 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final activeColor = const Color(0xFF27C2A0); // minty-teal like screenshot
-    final inactive = Colors.black.withOpacity(0.55);
+    final inactive = isDark
+        ? Colors.white.withValues(alpha: 0.55)
+        : Colors.black.withValues(alpha: 0.55);
 
     return Expanded(
       child: GestureDetector(
@@ -111,7 +112,7 @@ class _NavButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
             decoration: BoxDecoration(
               color: selected
-                  ? activeColor.withOpacity(0.1)
+                  ? activeColor.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),

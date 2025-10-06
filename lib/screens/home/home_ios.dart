@@ -145,7 +145,7 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
             ),
           ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          const SliverToBoxAdapter(child: SizedBox(height: 130)),
         ],
       ),
     );
@@ -161,7 +161,7 @@ class _BrandGlyph extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.only(left: 4),
       child: _CircleGlyph(
-        color: CupertinoColors.activeGreen,
+        color: Color(0xFF528F65),
         child: Text(
           'e',
           style: TextStyle(
@@ -241,7 +241,7 @@ class _PromoBanner extends StatelessWidget {
                       end: Alignment.centerRight,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.05),
+                        Colors.black.withValues(alpha: 0.05),
                       ],
                     ),
                   ),
@@ -365,7 +365,7 @@ class _CategoryTile extends StatelessWidget {
                         end: Alignment.centerRight,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.05),
+                          Colors.black.withValues(alpha: 0.05),
                         ],
                       ),
                     ),
@@ -401,7 +401,7 @@ class _SectionHeader extends StatelessWidget {
                 Text(
                   'View All',
                   style: TextStyle(
-                    color: CupertinoColors.activeGreen,
+                    color: Color(0xFF528F65),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -409,7 +409,7 @@ class _SectionHeader extends StatelessWidget {
                 Icon(
                   CupertinoIcons.arrow_right_circle,
                   size: 18,
-                  color: CupertinoColors.activeGreen,
+                  color: Color(0xFF528F65),
                 ),
               ],
             ),

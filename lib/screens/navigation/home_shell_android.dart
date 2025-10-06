@@ -36,17 +36,22 @@ class _HomeShellAndroidState extends State<HomeShellAndroid> {
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
+
           NavigationDestination(
-            icon: Icon(Icons.person_rounded),
-            label: 'Account',
+            icon: Icon(Icons.bar_chart_rounded),
+            label: 'Wishlist',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_rounded),
-            label: 'Analytics',
+            label: 'Cart',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_rounded),
+            label: 'My Order',
           ),
           NavigationDestination(
             icon: Icon(Icons.more_horiz_rounded),
-            label: 'More',
+            label: 'Account',
           ),
         ],
       ),

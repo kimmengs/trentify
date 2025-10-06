@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:trentify/model/product.dart';
 import 'package:trentify/screens/home/widget/build_product_image_widget.dart';
 import 'package:trentify/screens/home/widget/dark_circle_widget.dart';
@@ -6,13 +7,15 @@ import 'package:trentify/screens/home/widget/rating_chip_widget.dart';
 
 class ProductCardWidget extends StatelessWidget {
   final Product product;
-  const ProductCardWidget({required this.product, super.key});
 
+  const ProductCardWidget({required this.product, super.key});
   @override
   Widget build(BuildContext context) {
-    const tileBg = Color(0xFFF1F2F4);
-    const priceColor = CupertinoColors.activeGreen;
-
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
+    final tileBg = isDark ? const Color(0xFFF1F2F4) : Colors.black;
+    final bgColor = isDark ? Colors.black : const Color(0xFFF1F2F4);
+    const priceColor = Color(0xFF528F65);
     return LayoutBuilder(
       builder: (context, constraints) {
         final hasBoundedHeight =
@@ -30,7 +33,7 @@ class ProductCardWidget extends StatelessWidget {
         final card = ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Container(
-            color: CupertinoColors.systemBackground,
+            color: bgColor,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -41,7 +44,7 @@ class ProductCardWidget extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        const ColoredBox(color: tileBg),
+                        ColoredBox(color: tileBg),
                         BuildProductImageWidget(product.imageUrl),
                         Positioned(
                           top: 8,
@@ -81,7 +84,8 @@ class ProductCardWidget extends StatelessWidget {
                         product.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),

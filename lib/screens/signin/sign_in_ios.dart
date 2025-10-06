@@ -114,7 +114,7 @@ class _SignInPageCupertinoState extends State<SignInPageCupertino> {
                     height: 96,
                     width: 96,
                     decoration: const BoxDecoration(
-                      color: CupertinoColors.activeBlue,
+                      color: Color(0xFF528F65),
                       shape: BoxShape.circle,
                     ),
                     child: const Center(
@@ -188,6 +188,7 @@ class _SignInPageCupertinoState extends State<SignInPageCupertino> {
 
                 // Sign in button
                 CupertinoButton.filled(
+                  color: Color(0xFF528F65),
                   onPressed: _loading ? null : _signIn,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   child: _loading
@@ -278,7 +279,7 @@ class _CupertinoFieldContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: border.withOpacity(0.6), width: 0.8),
+        border: Border.all(color: border.withValues(alpha: 0.6), width: 0.8),
       ),
       child: child,
     );

@@ -172,7 +172,7 @@ class TransactionDetailIOS extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: CupertinoColors.black.withOpacity(0.8),
+              color: CupertinoColors.black.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,

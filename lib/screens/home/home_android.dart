@@ -72,7 +72,9 @@ class _TrendifyHomeMaterialState extends State<TrendifyHomeMaterial> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: selected ? Colors.green : Colors.grey.shade300,
+                        color: selected
+                            ? Color(0xFF528F65)
+                            : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(26),
                       ),
                       child: Text(
@@ -109,12 +111,7 @@ class _TrendifyHomeMaterialState extends State<TrendifyHomeMaterial> {
             sliver: SliverGrid(
               delegate: SliverChildBuilderDelegate((context, index) {
                 final c = DemoDb.categories[index];
-                return _CategoryTile(
-                  title: c.title,
-                  // If you have images, pass them via imageProvider (AssetImage/NetworkImage).
-                  // imageProvider: AssetImage('assets/cat_women.png'),
-                  icon: c.icon, // fallback to big icon if no image
-                );
+                return _CategoryTile(title: c.title, icon: c.icon);
               }, childCount: DemoDb.categories.length),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
@@ -239,7 +236,7 @@ class _BrandGlyph extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 8),
       child: CircleAvatar(
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xFF528F65),
         radius: 18,
         child: const Text(
           'e',
@@ -335,12 +332,16 @@ class _SectionHeader extends StatelessWidget {
                 Text(
                   'View All',
                   style: TextStyle(
-                    color: Colors.green,
+                    color: Color(0xFF528F65),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(width: 4),
-                Icon(Icons.arrow_circle_right, size: 18, color: Colors.green),
+                Icon(
+                  Icons.arrow_circle_right,
+                  size: 18,
+                  color: Color(0xFF528F65),
+                ),
               ],
             ),
           ),
@@ -397,7 +398,7 @@ class _CategoryPill extends StatelessWidget {
               ],
             ),
             alignment: Alignment.center,
-            child: Icon(icon, size: 22, color: Colors.green),
+            child: Icon(icon, size: 22, color: Color(0xFF528F65)),
           ),
           const SizedBox(width: 12),
           Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -485,7 +486,7 @@ class _ProductCard extends StatelessWidget {
           Text(
             '\$${product.price.toStringAsFixed(2)}',
             style: TextStyle(
-              color: Colors.green.shade700,
+              color: Color(0xFF528F65),
               fontWeight: FontWeight.w700,
               fontSize: 14,
             ),
@@ -547,7 +548,7 @@ class _SearchField extends StatelessWidget {
           ),
           child: const Padding(
             padding: EdgeInsets.all(6),
-            child: Icon(Icons.mic, color: Colors.green, size: 18),
+            child: Icon(Icons.mic, color: Color(0xFF528F65), size: 18),
           ),
         ),
         filled: true,

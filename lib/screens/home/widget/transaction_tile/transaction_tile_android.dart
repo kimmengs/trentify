@@ -12,7 +12,7 @@ class TransactionTileAndroid extends StatelessWidget {
   Widget build(BuildContext context) {
     final f = NumberFormat.currency(symbol: '\$');
     final isCredit = tx.amount >= 0;
-    final color = isCredit ? Colors.green.shade700 : Colors.red.shade600;
+    final color = isCredit ? Color(0xFF528F65) : Colors.red.shade600;
 
     return InkWell(
       onTap: () => _openDetail(context),

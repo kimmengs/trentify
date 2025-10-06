@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class CategoryPillsWidget extends StatelessWidget {
   final List<String> tabs;
@@ -14,9 +15,11 @@ class CategoryPillsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = const Color(0xFF2E7D32);
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
+    final activeColor = const Color(0xFF528F65);
     final inactiveBg = CupertinoDynamicColor.resolve(
-      CupertinoColors.white,
+      isDark ? Colors.black : CupertinoColors.white,
       context,
     );
     final inactiveBorder = CupertinoDynamicColor.resolve(
@@ -42,7 +45,7 @@ class CategoryPillsWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(26),
               border: selected
                   ? null
-                  : Border.all(color: inactiveBorder.withOpacity(0.6)),
+                  : Border.all(color: inactiveBorder.withValues(alpha: 0.6)),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x14000000),
@@ -54,7 +57,10 @@ class CategoryPillsWidget extends StatelessWidget {
             child: Text(
               tabs[i],
               style: TextStyle(
-                color: selected ? CupertinoColors.white : CupertinoColors.black,
+                height: 1,
+                color: selected
+                    ? CupertinoColors.white
+                    : (isDark ? CupertinoColors.white : CupertinoColors.black),
                 fontWeight: FontWeight.w600,
               ),
             ),

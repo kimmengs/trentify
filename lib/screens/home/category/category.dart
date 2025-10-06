@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:trentify/screens/home/category/filter_sheet.dart';
+import 'package:trentify/screens/home/category/show_platform_sort_sheet.dart';
 import 'package:trentify/screens/home/home_ios.dart';
 import 'package:trentify/screens/home/widget/product_card_widget.dart';
 
@@ -11,6 +13,8 @@ class CategoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final products = DemoDb.topPicks;
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -72,9 +76,13 @@ class CategoryPage extends StatelessWidget {
                     height: 54,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
+                      color: isDark
+                          ? Colors.black87
+                          : Colors.white.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: Colors.white.withOpacity(0.4)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.4),
+                      ),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x22000000),
@@ -89,7 +97,14 @@ class CategoryPage extends StatelessWidget {
                         _BottomButton(
                           icon: CupertinoIcons.arrow_up_arrow_down,
                           label: "Sort",
-                          onPressed: () {},
+                          onPressed: () async {
+                            final picked = await showPlatformSortSheet(
+                              context,
+                              initial: SortOption.mostSuitable,
+                            );
+
+                            print(picked);
+                          },
                         ),
                         const VerticalDivider(
                           width: 24,
@@ -99,7 +114,17 @@ class CategoryPage extends StatelessWidget {
                         _BottomButton(
                           icon: CupertinoIcons.slider_horizontal_3,
                           label: "Filter",
-                          onPressed: () {},
+                          onPressed: () async {
+                            final picked = await showPlatformFilterSheet(
+                              context,
+                              initial:
+                                  FilterResult.initial(), // or your current state
+                            );
+
+                            if (picked != null) {
+                              print(picked);
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -126,16 +151,26 @@ class _BottomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       onPressed: onPressed,
       child: Row(
         children: [
-          Icon(icon, size: 18, color: CupertinoColors.black),
+          Icon(
+            icon,
+            size: 18,
+            color: isDark ? Colors.white : CupertinoColors.black,
+          ),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: isDark ? Colors.white : CupertinoColors.black,
+            ),
           ),
         ],
       ),

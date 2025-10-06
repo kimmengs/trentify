@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:trentify/screens/cart/cart.dart';
 import 'package:trentify/screens/home/home.dart';
 import 'package:trentify/screens/more/%20more_page.dart';
+import 'package:trentify/screens/my_order/my_order.dart';
 import 'package:trentify/screens/navigation/modern_nav.dart';
+import 'package:trentify/screens/wish_list/wish_list.dart';
 
 class HomeShellCupertino extends StatefulWidget {
   const HomeShellCupertino({super.key});
@@ -12,18 +15,20 @@ class HomeShellCupertino extends StatefulWidget {
 
 class _HomeShellCupertinoState extends State<HomeShellCupertino> {
   int _index = 0;
-  final _visited = <bool>[true, false, false, false];
-  final _pages = <Widget?>[null, null, null, null];
+  final _visited = <bool>[true, false, false, false, false];
+  final _pages = <Widget?>[null, null, null, null, null];
 
   Widget _buildPage(int i) {
     switch (i) {
       case 0:
-        return const HomePage(); // real pages here
+        return const HomePage();
       case 1:
-        return const HomePage();
+        return const WishListPage();
       case 2:
-        return const HomePage();
+        return const CartPage();
       case 3:
+        return const MyOrderPage();
+      case 4:
         return const MorePage();
       default:
         return const SizedBox.shrink();
@@ -48,9 +53,10 @@ class _HomeShellCupertinoState extends State<HomeShellCupertino> {
       bottomNavigationBar: ModernBottomBar(
         items: const [
           ModernBottomBarItem(CupertinoIcons.house, 'Home'),
-          ModernBottomBarItem(CupertinoIcons.person_2, 'Lead'),
-          ModernBottomBarItem(CupertinoIcons.person_2, 'Challenge'),
-          ModernBottomBarItem(CupertinoIcons.ellipsis, 'More'),
+          ModernBottomBarItem(CupertinoIcons.heart_circle, 'Wishlist'),
+          ModernBottomBarItem(CupertinoIcons.cart_fill, 'Cart'),
+          ModernBottomBarItem(CupertinoIcons.doc_text_fill, 'My Order'),
+          ModernBottomBarItem(CupertinoIcons.person, 'Account'),
         ],
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
