@@ -46,9 +46,8 @@ class _HomeShellCupertinoState extends State<HomeShellCupertino> {
     });
 
     return Scaffold(
-      extendBody: true, // 🔑 lets content render under the bar
-      backgroundColor:
-          Colors.transparent, // optional if you have your own backdrop
+      extendBody: true,
+      backgroundColor: Colors.transparent,
       body: IndexedStack(index: _index, children: children),
       bottomNavigationBar: ModernBottomBar(
         items: const [

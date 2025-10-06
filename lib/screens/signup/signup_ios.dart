@@ -112,10 +112,7 @@ class _SignUpPageCupertinoState extends State<SignUpPageCupertino> {
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [
-                        CupertinoColors.activeBlue,
-                        CupertinoColors.systemBlue,
-                      ],
+                      colors: [Color(0xFF528F65), CupertinoColors.systemBlue],
                     ),
                   ),
                   alignment: Alignment.center,
@@ -205,7 +202,7 @@ class _SignUpPageCupertinoState extends State<SignUpPageCupertino> {
                     child: const Text(
                       'Sign in',
                       style: TextStyle(
-                        color: CupertinoColors.activeBlue,
+                        color: Color(0xFF528F65),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

@@ -108,7 +108,7 @@ class TransactionDetailIOS extends StatelessWidget {
                               child: const Icon(
                                 CupertinoIcons.doc_on_doc,
                                 size: 18,
-                                color: CupertinoColors.activeBlue,
+                                color: Color(0xFF528F65),
                               ),
                             ),
                           ],

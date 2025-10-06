@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +17,8 @@ class OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
     return CupertinoPageScaffold(
       child: SafeArea(
         child: IntroductionScreen(
@@ -28,13 +31,13 @@ class OnboardingPage extends StatelessWidget {
                 'assets/images/onboard/slide1.png',
                 width: 250,
               ),
-              decoration: const PageDecoration(
+              decoration: PageDecoration(
                 titleTextStyle: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
                 bodyTextStyle: TextStyle(fontSize: 16),
-                pageColor: CupertinoColors.white,
+                pageColor: isDark ? Colors.black : CupertinoColors.white,
               ),
             ),
             PageViewModel(
@@ -44,13 +47,13 @@ class OnboardingPage extends StatelessWidget {
                 'assets/images/onboard/slide2.png',
                 width: 250,
               ),
-              decoration: const PageDecoration(
+              decoration: PageDecoration(
                 titleTextStyle: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
                 bodyTextStyle: TextStyle(fontSize: 16),
-                pageColor: CupertinoColors.white,
+                pageColor: isDark ? Colors.black : CupertinoColors.white,
               ),
             ),
             PageViewModel(
@@ -60,45 +63,42 @@ class OnboardingPage extends StatelessWidget {
                 'assets/images/onboard/slide3.png',
                 width: 250,
               ),
-              decoration: const PageDecoration(
+              decoration: PageDecoration(
                 titleTextStyle: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
                 bodyTextStyle: TextStyle(fontSize: 16),
-                pageColor: CupertinoColors.white,
+                pageColor: isDark ? Colors.black : CupertinoColors.white,
               ),
             ),
           ],
 
           onDone: () => _onDone(context),
           showSkipButton: true,
-          skip: const Text(
-            "Skip",
-            style: TextStyle(color: CupertinoColors.activeBlue),
-          ),
+          skip: const Text("Skip", style: TextStyle(color: Color(0xFF528F65))),
           next: const Icon(
             CupertinoIcons.chevron_right,
-            color: CupertinoColors.activeBlue,
+            color: Color(0xFF528F65),
           ),
           done: const Text(
             "Get Started",
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: CupertinoColors.activeBlue,
+              color: Color(0xFF528F65),
             ),
           ),
 
           // iOS-style dots animation
           dotsDecorator: const DotsDecorator(
-            activeColor: CupertinoColors.activeBlue,
+            activeColor: Color(0xFF528F65),
             size: Size(10.0, 10.0),
             activeSize: Size(22.0, 10.0),
             activeShape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(25.0)),
             ),
           ),
-          globalBackgroundColor: CupertinoColors.white,
+          globalBackgroundColor: isDark ? Colors.black : CupertinoColors.white,
         ),
       ),
     );
