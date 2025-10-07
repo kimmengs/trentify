@@ -2,11 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trentify/model/demodb.dart';
-import 'package:trentify/model/product.dart';
-import 'package:trentify/screens/home/product_detail.dart';
 import 'package:trentify/screens/home/widget/category_pill_widget.dart';
 import 'package:trentify/screens/home/widget/horizontal_products.dart';
-import 'package:trentify/screens/home/widget/product_card_widget.dart';
 import 'package:trentify/screens/home/widget/search_fill_widget.dart';
 
 class TrendifyHomeCupertino extends StatefulWidget {
@@ -181,8 +178,10 @@ class _ProfileButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoButton(
       padding: EdgeInsets.zero,
-      onPressed: () {},
-      child: const Icon(CupertinoIcons.bell),
+      onPressed: () {
+        context.push('/notification');
+      },
+      child: const Icon(CupertinoIcons.bell, color: Color(0xFF528F65)),
     );
   }
 }

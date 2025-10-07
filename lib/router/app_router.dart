@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:trentify/model/demodb.dart';
 import 'package:trentify/screens/home/category/category.dart';
 import 'package:trentify/screens/home/home_ios.dart';
+import 'package:trentify/screens/home/notification/notification.dart';
 import 'package:trentify/screens/home/product_detail.dart';
 import 'package:trentify/screens/navigation/home_shell.dart';
 import 'package:trentify/screens/onboarding_page/onboarding_page.dart';
@@ -55,6 +56,11 @@ GoRouter createRouter({required String initialLocation}) {
           }
           return CupertinoPage(child: ProductDetailPage(data: data));
         },
+      ),
+      GoRoute(
+        path: AppRoutes.notification,
+        pageBuilder: (ctx, state) =>
+            const CupertinoPage(child: NotificationPage()),
       ),
     ],
   );

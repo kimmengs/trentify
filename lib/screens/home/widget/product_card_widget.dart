@@ -31,88 +31,95 @@ class ProductCardWidget extends StatelessWidget {
           }
         }
 
-        final card = InkWell(
-          onTap: () {
-            context.pushNamed(
-              'product-detail',
-              pathParameters: {'id': 'ubl-ss-001'},
-            );
-          },
-          child: ClipRRect(
+        final card = Material(
+          color: Colors.transparent,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            child: Container(
-              color: bgColor,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // IMAGE
-                  imageArea(
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          ColoredBox(color: tileBg),
-                          BuildProductImageWidget(product.imageUrl),
-                          Positioned(
-                            top: 8,
-                            left: 8,
-                            child: RatingChipWidget(rating: product.rating),
-                          ),
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: DarkCircleWidget(
-                              child: CupertinoButton(
-                                padding: const EdgeInsets.all(6),
-                                minSize: 0,
-                                onPressed: () {},
-                                child: const Icon(
-                                  CupertinoIcons.heart,
-                                  size: 18,
-                                  color: CupertinoColors.white,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () {
+              context.pushNamed(
+                'product-detail',
+                pathParameters: {'id': 'ubl-ss-001'},
+              );
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                color: bgColor,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // IMAGE
+                    imageArea(
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            ColoredBox(color: tileBg),
+                            BuildProductImageWidget(product.imageUrl),
+                            Positioned(
+                              top: 8,
+                              left: 8,
+                              child: RatingChipWidget(rating: product.rating),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: DarkCircleWidget(
+                                child: CupertinoButton(
+                                  padding: const EdgeInsets.all(6),
+                                  minSize: 0,
+                                  onPressed: () {},
+                                  child: const Icon(
+                                    CupertinoIcons.heart,
+                                    size: 18,
+                                    color: CupertinoColors.white,
+                                  ),
                                 ),
                               ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // TEXTS
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '\$${product.price.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              color: priceColor,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 8),
-
-                  // TEXTS
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          product.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '\$${product.price.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            color: priceColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 6),
-                ],
+                    const SizedBox(height: 6),
+                  ],
+                ),
               ),
             ),
           ),

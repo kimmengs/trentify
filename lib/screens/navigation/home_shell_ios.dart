@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:trentify/screens/cart/cart.dart';
+import 'package:trentify/screens/add_to_cart/add_to_cart.dart';
 import 'package:trentify/screens/home/home.dart';
 import 'package:trentify/screens/more/%20more_page.dart';
 import 'package:trentify/screens/my_order/my_order.dart';
@@ -25,7 +25,7 @@ class _HomeShellCupertinoState extends State<HomeShellCupertino> {
       case 1:
         return const WishListPage();
       case 2:
-        return const CartPage();
+        return const AddToCartPage();
       case 3:
         return const MyOrderPage();
       case 4:

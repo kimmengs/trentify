@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trentify/provider/product_provider.dart';
@@ -76,10 +77,33 @@ class App extends StatelessWidget {
       return CupertinoApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: router,
+
+        // ✅ Localizations so RawChip / ChoiceChip etc. won’t crash
+        supportedLocales: const [Locale('en')], // add more if you support them
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+
+        // Your existing theme
         theme: buildCupertinoTheme(
           brightness: targetBrightness,
-          primary: theme.seed, // keep brand color consistent with Material
+          primary: theme.seed,
         ),
+
+        // ✅ Wrap every page with a Material Theme so Material widgets have proper theming
+        builder: (context, child) {
+          final materialTheme = buildMaterialTheme(
+            brightness: targetBrightness,
+            seed: theme.seed,
+            packId: theme.packId,
+          );
+          return Theme(
+            data: materialTheme,
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
       );
     }
 
