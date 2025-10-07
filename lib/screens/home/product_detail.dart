@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:trentify/model/demodb.dart';
+import 'package:trentify/screens/home/widget/horizontal_products.dart';
 
 /// --- DATA MODEL YOU CAN MAP FROM YOUR EXISTING PRODUCT ---
 @immutable
@@ -272,16 +274,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ),
           ),
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: 220,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (_, i) =>
-                    _SuggestionCard(widget.data.suggestions[i]),
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemCount: widget.data.suggestions.length,
-              ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: HorizontalProducts(products: DemoDb.newArrivals),
             ),
           ),
           const SliverToBoxAdapter(
@@ -685,7 +680,7 @@ class _ReviewTile extends StatelessWidget {
             children: [
               const CircleAvatar(
                 radius: 18,
-                backgroundImage: AssetImage('assets/avatar_placeholder.png'),
+                backgroundImage: AssetImage('assets/images/avatar/01.png'),
               ),
               const SizedBox(width: 10),
               Expanded(

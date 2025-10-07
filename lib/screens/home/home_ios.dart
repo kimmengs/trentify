@@ -5,6 +5,7 @@ import 'package:trentify/model/demodb.dart';
 import 'package:trentify/model/product.dart';
 import 'package:trentify/screens/home/product_detail.dart';
 import 'package:trentify/screens/home/widget/category_pill_widget.dart';
+import 'package:trentify/screens/home/widget/horizontal_products.dart';
 import 'package:trentify/screens/home/widget/product_card_widget.dart';
 import 'package:trentify/screens/home/widget/search_fill_widget.dart';
 
@@ -77,7 +78,7 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: _HorizontalProducts(products: DemoDb.topPicks),
+              child: HorizontalProducts(products: DemoDb.topPicks),
             ),
           ),
 
@@ -124,7 +125,7 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _HorizontalProducts(products: DemoDb.newArrivals),
+              child: HorizontalProducts(products: DemoDb.newArrivals),
             ),
           ),
 
@@ -141,7 +142,7 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _HorizontalProducts(products: DemoDb.hotDeals),
+              child: HorizontalProducts(products: DemoDb.hotDeals),
             ),
           ),
 
@@ -490,25 +491,6 @@ class _CategoryImage extends StatelessWidget {
       errorBuilder: (_, __, ___) => Padding(
         padding: const EdgeInsets.all(8),
         child: Icon(icon, size: 44, color: CupertinoColors.systemGrey),
-      ),
-    );
-  }
-}
-
-class _HorizontalProducts extends StatelessWidget {
-  final List<Product> products;
-  const _HorizontalProducts({required this.products});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 300,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: products.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, index) =>
-            ProductCardWidget(product: products[index]),
       ),
     );
   }

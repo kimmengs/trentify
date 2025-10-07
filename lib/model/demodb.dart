@@ -78,9 +78,9 @@ class DemoDb {
       name: 'Urban Blend Long Sleeve Shirt',
       price: 185.00,
       imageUrls: const [
-        'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1200&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1520975922203-b6a5969c8d46?q=80&w=1200&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1520975619010-6b2a5d4fb70e?q=80&w=1200&auto=format&fit=crop',
+        'https://bbtrading.ch/data/image.php?image=851_03920/851_03920_imageMain.jpg&width=280&height=280',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoKjAkCpWRjiMMLXm-UTfDhMYbyQf9sIFK3w&s',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr8F6TH3NaUoqmZg_gGSxz3m2bbxJ2wpwflw&s',
       ],
       rating: 4.8,
       sold: 2475,
@@ -135,21 +135,22 @@ class DemoDb {
       suggestions: const [
         RawSuggestion(
           image:
-              'https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=600&auto=format&fit=crop',
+              'https://bbtrading.ch/data/image.php?image=851_03920/851_03920_imageMain.jpg&width=280&height=280',
+
           title: 'Moda Chic Luxury Hoodie',
           price: 200.00,
           rating: 4.8,
         ),
         RawSuggestion(
           image:
-              'https://images.unsplash.com/photo-1520975867597-0f23a4fb0a3a?q=80&w=600&auto=format&fit=crop',
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoKjAkCpWRjiMMLXm-UTfDhMYbyQf9sIFK3w&s',
           title: 'Trend Craft Fleece',
           price: 210.00,
           rating: 4.9,
         ),
         RawSuggestion(
           image:
-              'https://images.unsplash.com/photo-1520975846138-bd1d4d1d8a9a?q=80&w=600&auto=format&fit=crop',
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr8F6TH3NaUoqmZg_gGSxz3m2bbxJ2wpwflw&s',
           title: 'Street Style Zip',
           price: 190.00,
           rating: 4.5,
@@ -163,8 +164,7 @@ class DemoDb {
       name: 'Cleanline Essential Hoodie',
       price: 129.00,
       imageUrls: const [
-        'https://images.unsplash.com/photo-1520975731977-5f1406f9a6b1?q=80&w=1200&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1520975706600-79b4b3c1f9d8?q=80&w=1200&auto=format&fit=crop',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoKjAkCpWRjiMMLXm-UTfDhMYbyQf9sIFK3w&s',
       ],
       rating: 4.6,
       sold: 1349,
@@ -200,7 +200,7 @@ class DemoDb {
       suggestions: const [
         RawSuggestion(
           image:
-              'https://images.unsplash.com/photo-1520975635021-3a2a08f9854f?q=80&w=600&auto=format&fit=crop',
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoKjAkCpWRjiMMLXm-UTfDhMYbyQf9sIFK3w&s',
           title: 'City Knit Beanie',
           price: 29.00,
           rating: 4.7,

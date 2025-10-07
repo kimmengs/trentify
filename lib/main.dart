@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trentify/provider/product_provider.dart';
 
 import 'router/app_router.dart';
 import 'router/app_routes.dart';
@@ -34,7 +35,7 @@ Future<void> main() async {
 
   // Provide ThemeController so the whole app can react to theme changes.
   runApp(
-   MultiProvider(
+    MultiProvider(
       providers: [
         // your existing one
         ChangeNotifierProvider<ThemeController>(
@@ -42,21 +43,10 @@ Future<void> main() async {
         ),
 
         // add more here
-        Provider<ProductRepository>(
-          create: (_) => InMemoryProductRepository(),
-        ),
-        ChangeNotifierProvider<CartController>(
-          create: (_) => CartController(),
-        ),
-
-        // If something depends on another provider, use ProxyProvider:
-        // ProxyProvider<AuthController, ProductRepository>(
-        //   update: (_, auth, __) => ApiProductRepository(token: auth.token),
-        // ),
+        Provider<ProductRepository>(create: (_) => InMemoryProductRepository()),
       ],
       child: App(showOnboarding: !seen),
     ),
-  );
   );
 }
 
