@@ -137,7 +137,7 @@ class ReviewSummaryMaterial extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Review Summary')),
       body: SafeArea(child: content),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Color(0xFF528F65),
     );
   }
 }

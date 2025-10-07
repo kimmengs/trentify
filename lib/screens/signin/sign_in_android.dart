@@ -56,10 +56,10 @@ class _SignInPageAndroidState extends State<SignInPageAndroid> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: scheme.surface,
+      backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(title: const Text('Login to Your Account')),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -72,7 +72,7 @@ class _SignInPageAndroidState extends State<SignInPageAndroid> {
               Center(
                 child: CircleAvatar(
                   radius: 48,
-                  backgroundColor: scheme.primary,
+                  backgroundColor: Color(0xFF528F65),
                   child: const Icon(
                     Icons.grid_3x3_rounded,
                     color: Colors.white,
@@ -123,6 +123,7 @@ class _SignInPageAndroidState extends State<SignInPageAndroid> {
               FilledButton(
                 onPressed: _loading ? null : _signIn,
                 style: FilledButton.styleFrom(
+                  backgroundColor: Color(0xFF528F65),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: _loading

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/widgets.dart';
 import 'home_shell_ios.dart';
-import 'home_shell_android.dart';
 
 bool get _isCupertino =>
     defaultTargetPlatform == TargetPlatform.iOS ||
@@ -13,6 +12,8 @@ class HomeShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _isCupertino ? const HomeShellCupertino() : const HomeShellAndroid();
+    return _isCupertino
+        ? const HomeShellCupertino()
+        : const HomeShellCupertino();
   }
 }

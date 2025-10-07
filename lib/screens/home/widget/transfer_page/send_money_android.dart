@@ -163,7 +163,7 @@ class _SendMoneyMaterialState extends State<SendMoneyMaterial> {
     return Scaffold(
       appBar: AppBar(title: const Text('Send Money to')),
       body: SafeArea(child: content),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Color(0xFF528F65),
     );
   }
 }

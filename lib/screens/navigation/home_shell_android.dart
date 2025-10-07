@@ -1,74 +1,102 @@
-import 'package:flutter/material.dart';
-import 'package:trentify/screens/home/home.dart';
-import 'package:trentify/screens/more/%20more_page.dart';
+// import 'package:flutter/material.dart';
+// import 'package:trentify/screens/cart/cart.dart';
+// import 'package:trentify/screens/home/home.dart';
+// import 'package:trentify/screens/more/ more_page.dart';
+// import 'package:trentify/screens/my_order/my_order.dart';
+// import 'package:trentify/screens/wish_list/wish_list.dart';
 
-class HomeShellAndroid extends StatefulWidget {
-  const HomeShellAndroid({super.key});
+// class HomeShellMaterial extends StatefulWidget {
+//   const HomeShellMaterial({super.key});
+//   @override
+//   State<HomeShellMaterial> createState() => _HomeShellMaterialState();
+// }
 
-  @override
-  State<HomeShellAndroid> createState() => _HomeShellAndroidState();
-}
+// class _HomeShellMaterialState extends State<HomeShellMaterial> {
+//   int _index = 0;
+//   final _visited = <bool>[true, false, false, false, false];
+//   final _pages = <Widget?>[null, null, null, null, null];
 
-class _HomeShellAndroidState extends State<HomeShellAndroid> {
-  int _index = 0;
+//   Widget _buildPage(int i) {
+//     switch (i) {
+//       case 0:
+//         return const HomePage();
+//       case 1:
+//         return const WishListPage();
+//       case 2:
+//         return const CartPage();
+//       case 3:
+//         return const MyOrderPage();
+//       case 4:
+//         return const MorePage();
+//       default:
+//         return const SizedBox.shrink();
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    final pages = <Widget>[
-      const HomePage(),
-      const _ScaffoldPage(
-        title: 'Account',
-        child: Text('Account – Coming soon'),
-      ),
-      const _ScaffoldPage(
-        title: 'Analytics',
-        child: Text('Analytics – Coming soon'),
-      ),
-      const MorePage(),
-    ];
+//   @override
+//   Widget build(BuildContext context) {
+//     // mark current tab as visited
+//     _visited[_index] = true;
 
-    return Scaffold(
-      body: SafeArea(
-        child: IndexedStack(index: _index, children: pages),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Home'),
+//     final children = List<Widget>.generate(_visited.length, (i) {
+//       if (!_visited[i]) return const SizedBox.shrink(); // not built yet
+//       return _pages[i] ??= _buildPage(i); // build once, keep alive
+//     });
 
-          NavigationDestination(
-            icon: Icon(Icons.bar_chart_rounded),
-            label: 'Wishlist',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bar_chart_rounded),
-            label: 'Cart',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_rounded),
-            label: 'My Order',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.more_horiz_rounded),
-            label: 'Account',
-          ),
-        ],
-      ),
-    );
-  }
-}
+//     return Scaffold(
+//       extendBody: true,
+//       backgroundColor: Colors.transparent,
+//       body: IndexedStack(index: _index, children: children),
 
-class _ScaffoldPage extends StatelessWidget {
-  const _ScaffoldPage({required this.title, required this.child});
-  final String title;
-  final Widget child;
+//       // MATERIAL 3 NAV BAR (recommended)
+//       bottomNavigationBar: NavigationBar(
+//         selectedIndex: _index,
+//         onDestinationSelected: (i) => setState(() => _index = i),
+//         destinations: const [
+//           NavigationDestination(
+//             icon: Icon(Icons.home_outlined),
+//             selectedIcon: Icon(Icons.home),
+//             label: 'Home',
+//           ),
+//           NavigationDestination(
+//             icon: Icon(Icons.favorite_border),
+//             selectedIcon: Icon(Icons.favorite),
+//             label: 'Wishlist',
+//           ),
+//           NavigationDestination(
+//             icon: Icon(Icons.shopping_cart_outlined),
+//             selectedIcon: Icon(Icons.shopping_cart),
+//             label: 'Cart',
+//           ),
+//           NavigationDestination(
+//             icon: Icon(Icons.receipt_long_outlined),
+//             selectedIcon: Icon(Icons.receipt_long),
+//             label: 'My Order',
+//           ),
+//           NavigationDestination(
+//             icon: Icon(Icons.person_outline),
+//             selectedIcon: Icon(Icons.person),
+//             label: 'Account',
+//           ),
+//         ],
+//       ),
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(child: child),
-    );
-  }
-}
+//       // If you prefer the classic BottomNavigationBar, comment the NavigationBar above
+//       // and uncomment this:
+//       /*
+//       bottomNavigationBar: BottomNavigationBar(
+//         currentIndex: _index,
+//         type: BottomNavigationBarType.fixed,
+//         onTap: (i) => setState(() => _index = i),
+//         items: const [
+//           BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
+//           BottomNavigationBarItem(icon: Icon(Icons.favorite_border), activeIcon: Icon(Icons.favorite), label: 'Wishlist'),
+//           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), activeIcon: Icon(Icons.shopping_cart), label: 'Cart'),
+//           BottomNavigationBarItem(icon: Icon(Icons.receipt_long_outlined), activeIcon: Icon(Icons.receipt_long), label: 'My Order'),
+//           BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Account'),
+//         ],
+//       ),
+//       */
+//     );
+//   }
+// }

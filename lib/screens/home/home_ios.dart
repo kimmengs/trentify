@@ -1,5 +1,3 @@
-// lib/screens/home/trendify_home_ios.dart
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -282,7 +280,9 @@ class _PromoText extends StatelessWidget {
         ),
         SizedBox(height: 6),
         Text(
-          'Get discount for every\norder, only valid for today',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          'Get discount for every order, only valid for today',
           style: TextStyle(color: Color(0xFFEAF7EE), height: 1.2),
         ),
       ],

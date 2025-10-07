@@ -233,7 +233,7 @@ class _MaterialInput extends StatelessWidget {
         prefixIcon: prefix,
         suffixIcon: suffix,
         filled: true,
-        fillColor: scheme.surfaceContainerHighest,
+        fillColor: Color(0xFF528F65),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 16,

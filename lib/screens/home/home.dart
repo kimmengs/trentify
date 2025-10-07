@@ -16,6 +16,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return _isCupertino
         ? const TrendifyHomeCupertino()
-        : const TrendifyHomeMaterial();
+        : const TrendifyHomeCupertino();
   }
 }

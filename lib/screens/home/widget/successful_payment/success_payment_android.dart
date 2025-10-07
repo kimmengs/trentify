@@ -109,7 +109,7 @@ class SuccessPaymentMaterial extends StatelessWidget {
       );
     } else {
       return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Color(0xFF528F65),
         body: PopScope(canPop: false, child: SafeArea(child: content)),
       );
     }
