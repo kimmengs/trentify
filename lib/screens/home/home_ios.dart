@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trentify/model/demodb.dart';
 import 'package:trentify/model/product.dart';
+import 'package:trentify/screens/home/product_detail.dart';
 import 'package:trentify/screens/home/widget/category_pill_widget.dart';
 import 'package:trentify/screens/home/widget/product_card_widget.dart';
 import 'package:trentify/screens/home/widget/search_fill_widget.dart';
@@ -565,80 +567,4 @@ class CategoryItem {
   final String imagePath;
   final IconData? icon;
   const CategoryItem(this.title, this.imagePath, {this.icon});
-}
-
-class DemoDb {
-  static const topPicks = [
-    Product(
-      title: 'Urban Blend Long Sleeve',
-      price: 185,
-      rating: 4.8,
-      imageUrl: 'assets/images/demo/01.jpeg',
-    ),
-    Product(
-      title: 'Luxe Blend Formal Tee',
-      price: 160,
-      rating: 4.6,
-      imageUrl: 'assets/images/demo/02.jpeg',
-    ),
-    Product(
-      title: 'Urban Flex Cotton Hoodie',
-      price: 175,
-      rating: 4.7,
-      imageUrl: 'assets/images/demo/03.jpeg',
-    ),
-  ];
-
-  static const categories = [
-    CategoryItem('Women', 'assets/images/demo/promotion.png'),
-    CategoryItem('Men', 'assets/images/demo/men.png'),
-    CategoryItem('Shoe', 'assets/images/demo/shoe.png'),
-    CategoryItem('Bag', 'assets/images/demo/bag.png'),
-    CategoryItem('Luxury', 'assets/images/demo/luxury.png'),
-    CategoryItem('Kids', 'assets/images/demo/kid.png'),
-    CategoryItem('Sports', 'assets/images/demo/sport.png'),
-    CategoryItem('Beauty', 'assets/images/demo/beauty.png'),
-  ];
-
-  static const newArrivals = [
-    Product(
-      title: 'Trend Craft Fleece Hoodie',
-      price: 210,
-      rating: 4.9,
-      imageUrl: 'assets/images/demo/01.jpeg',
-    ),
-    Product(
-      title: 'Moda Chic Luxurious Top',
-      price: 200,
-      rating: 4.8,
-      imageUrl: 'assets/images/demo/02.jpeg',
-    ),
-    Product(
-      title: 'Urban Elegant Blazer',
-      price: 215,
-      rating: 4.5,
-      imageUrl: 'assets/images/demo/03.jpeg',
-    ),
-  ];
-
-  static const hotDeals = [
-    Product(
-      title: 'Street Style Cozy Hoodie',
-      price: 120,
-      rating: 4.5,
-      imageUrl: 'assets/images/demo/01.jpeg',
-    ),
-    Product(
-      title: 'Street Style Comfort Tee',
-      price: 95,
-      rating: 4.7,
-      imageUrl: 'assets/images/demo/02.jpeg',
-    ),
-    Product(
-      title: 'Vogue Fit Cotton',
-      price: 140,
-      rating: 4.6,
-      imageUrl: 'assets/images/demo/03.jpeg',
-    ),
-  ];
 }

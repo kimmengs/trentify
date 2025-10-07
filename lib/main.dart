@@ -34,10 +34,29 @@ Future<void> main() async {
 
   // Provide ThemeController so the whole app can react to theme changes.
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeController(prefs),
+   MultiProvider(
+      providers: [
+        // your existing one
+        ChangeNotifierProvider<ThemeController>(
+          create: (_) => ThemeController(prefs),
+        ),
+
+        // add more here
+        Provider<ProductRepository>(
+          create: (_) => InMemoryProductRepository(),
+        ),
+        ChangeNotifierProvider<CartController>(
+          create: (_) => CartController(),
+        ),
+
+        // If something depends on another provider, use ProxyProvider:
+        // ProxyProvider<AuthController, ProductRepository>(
+        //   update: (_, auth, __) => ApiProductRepository(token: auth.token),
+        // ),
+      ],
       child: App(showOnboarding: !seen),
     ),
+  );
   );
 }
 
