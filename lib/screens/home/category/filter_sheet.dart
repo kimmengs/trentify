@@ -5,63 +5,11 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
+import 'package:trentify/model/filter_result.dart';
+import 'package:trentify/widgets/color_grid_widget.dart';
+import 'package:trentify/widgets/grid_circle_widget.dart';
 
-/// --------------------
-/// DATA MODEL
-/// --------------------
-class FilterResult {
-  final Set<String> categories;
-  final RangeValues priceRange; // (min, max) in dollars
-  final int? ratingAtLeast; // 3, 4, 5 or null
-  final Set<String> sizes; // e.g. ["S","M","L","38"]
-  final String? colorName; // e.g. "Black"
-  const FilterResult({
-    required this.categories,
-    required this.priceRange,
-    required this.ratingAtLeast,
-    required this.sizes,
-    required this.colorName,
-  });
-
-  FilterResult copyWith({
-    Set<String>? categories,
-    RangeValues? priceRange,
-    int? ratingAtLeast,
-    Set<String>? sizes,
-    String? colorName,
-  }) {
-    return FilterResult(
-      categories: categories ?? this.categories,
-      priceRange: priceRange ?? this.priceRange,
-      ratingAtLeast: ratingAtLeast,
-      sizes: sizes ?? this.sizes,
-      colorName: colorName,
-    );
-  }
-
-  static const defaultMin = 1.0;
-  static const defaultMax = 300.0;
-
-  static FilterResult initial() => const FilterResult(
-    categories: {"Men"},
-    priceRange: RangeValues(85, 220),
-    ratingAtLeast: null,
-    sizes: {"L", "38"},
-    colorName: "Black",
-  );
-
-  static FilterResult cleared() => const FilterResult(
-    categories: {},
-    priceRange: RangeValues(defaultMin, defaultMax),
-    ratingAtLeast: null,
-    sizes: {},
-    colorName: null,
-  );
-}
-
-/// --------------------
-/// ENTRY POINT (platform adaptive)
-/// --------------------
+/// -
 Future<FilterResult?> showPlatformFilterSheet(
   BuildContext context, {
   FilterResult? initial,
@@ -313,7 +261,7 @@ class _FilterSheetState extends State<FilterSheet> {
 
                     _SectionTitle("Size"),
                     const SizedBox(height: 8),
-                    _GridCircles<String>(
+                    GridCirclesWidget<String>(
                       values: sizes,
                       isSelected: (v) => state.sizes.contains(v),
                       onTap: (v) {
@@ -330,7 +278,7 @@ class _FilterSheetState extends State<FilterSheet> {
 
                     _SectionTitle("Color"),
                     const SizedBox(height: 10),
-                    _ColorGrid(
+                    ColorGridWidget(
                       colors: colorDots,
                       selectedName: state.colorName,
                       onPick: (name) => setState(
@@ -533,135 +481,6 @@ class _WrapChips<T> extends StatelessWidget {
           ),
         );
       }).toList(),
-    );
-  }
-}
-
-class _GridCircles<T> extends StatelessWidget {
-  final List<T> values;
-  final bool Function(T) isSelected;
-  final void Function(T) onTap;
-  final Color textPrimary;
-  final Color border;
-  final Color selectedFill;
-
-  const _GridCircles({
-    required this.values,
-    required this.isSelected,
-    required this.onTap,
-    required this.textPrimary,
-    required this.border,
-    required this.selectedFill,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: values.map((v) {
-        final selected = isSelected(v);
-        return CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => onTap(v),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: selected ? selectedFill : Colors.transparent,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: border),
-                ),
-                child: Text(
-                  v.toString(),
-                  style: TextStyle(
-                    color: selected ? Colors.white : textPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _ColorGrid extends StatelessWidget {
-  final Map<String, Color> colors;
-  final String? selectedName;
-  final void Function(String) onPick;
-  final Color textPrimary;
-  final Color border;
-
-  const _ColorGrid({
-    required this.colors,
-    required this.selectedName,
-    required this.onPick,
-    required this.textPrimary,
-    required this.border,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final entries = colors.entries.toList();
-    return Column(
-      children: [
-        Wrap(
-          spacing: 14,
-          runSpacing: 16,
-          children: entries.map((e) {
-            final selected = e.key == selectedName;
-            return SizedBox(
-              width: 72,
-              child: CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () => onPick(e.key),
-                child: Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: e.value,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: border),
-                          ),
-                        ),
-                        if (selected)
-                          const Icon(
-                            CupertinoIcons.check_mark,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      e.key,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: textPrimary.withOpacity(0.9),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
     );
   }
 }

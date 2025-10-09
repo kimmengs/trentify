@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:trentify/model/filter_result.dart';
+import 'package:trentify/model/name_color.dart';
+import 'package:trentify/screens/add_to_cart/edit_cart_item_sheet_widget.dart';
 
 class CartItem {
   final String id;
@@ -10,6 +14,7 @@ class CartItem {
   final double price;
   int qty;
   bool selected;
+  int stock;
 
   CartItem({
     required this.id,
@@ -21,6 +26,7 @@ class CartItem {
     required this.price,
     this.qty = 1,
     this.selected = true,
+    this.stock = 10,
   });
 }
 
@@ -192,8 +198,47 @@ class _AddToCartPageState extends State<AddToCartPage> {
                           IconButton(
                             tooltip: 'Edit',
                             icon: const Icon(Icons.edit_outlined),
-                            onPressed: () {
-                              // TODO: open edit bottom sheet (size/color)
+                            onPressed: () async {
+                              final updated =
+                                  await showBarModalBottomSheet<CartItem>(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (ctx) => EditCartItemSheet(
+                                      initial: FilterResult.initial(),
+                                      item: item,
+                                      // supply available options however you like:
+                                      availableSizes: const [
+                                        'XS',
+                                        'S',
+                                        'M',
+                                        'L',
+                                        'XL',
+                                      ],
+                                      availableColors: const [
+                                        NamedColor('Black', Colors.black),
+                                        NamedColor('White', Colors.white),
+                                        NamedColor('Brown', Color(0xFF8B5E3C)),
+                                        NamedColor(
+                                          'Blue Grey',
+                                          Color(0xFF607D8B),
+                                        ),
+                                        NamedColor('Indigo', Color(0xFF3F51B5)),
+                                        NamedColor(
+                                          'Deep Purple',
+                                          Color(0xFF673AB7),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                              if (updated != null) {
+                                setState(() {
+                                  final i = _items.indexWhere(
+                                    (e) => e.id == updated.id,
+                                  );
+                                  if (i != -1) _items[i] = updated;
+                                });
+                              }
                             },
                           ),
                           IconButton(
