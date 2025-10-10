@@ -2,10 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/model/name_color.dart';
 import 'package:trentify/screens/add_to_cart/add_to_cart.dart';
+import 'package:trentify/screens/home/widget/round_icon_button_widget.dart';
 import 'package:trentify/widgets/color_grid_widget.dart';
 import 'package:trentify/widgets/grid_circle_widget.dart';
 
@@ -106,9 +106,10 @@ class _EditCartItemSheetState extends State<EditCartItemSheet> {
       color: Colors.transparent,
       child: SafeArea(
         top: false,
+        bottom: false,
         child: Container(
           decoration: BoxDecoration(
-            color: cs.surfaceContainerHighest,
+            color: isDark ? Colors.black : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
@@ -124,7 +125,7 @@ class _EditCartItemSheetState extends State<EditCartItemSheet> {
                 child: Text(
                   'Edit Product Variant',
                   style: text.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -155,7 +156,7 @@ class _EditCartItemSheetState extends State<EditCartItemSheet> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: text.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -174,7 +175,8 @@ class _EditCartItemSheetState extends State<EditCartItemSheet> {
                         Text(
                           '\$${widget.item.price.toStringAsFixed(2)}',
                           style: text.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF5C8F62),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -187,33 +189,30 @@ class _EditCartItemSheetState extends State<EditCartItemSheet> {
                       ],
                     ),
                   ),
-
-                  // Qty pill (– 2 +)
                 ],
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               _Divider(color: cs.outlineVariant),
-
+              const SizedBox(height: 12),
               // size
               _SectionTitle("Size"),
-              const SizedBox(height: 8),
-              GridCirclesWidget<String>(
+              const SizedBox(height: 12),
+              GridCirclesWidget<String>.single(
                 values: sizes,
-                isSelected: (v) => state.sizes.contains(v),
-                onTap: (v) {
-                  final s = {...state.sizes};
-                  s.contains(v) ? s.remove(v) : s.add(v);
-                  setState(() => state = state.copyWith(sizes: s));
-                },
+                selectedValue: _size,
+                onChanged: (v) => setState(() => _size = v),
                 textPrimary: textPrimary,
                 border: border,
                 selectedFill: brand,
               ),
 
               // color
+              const SizedBox(height: 12),
+              _Divider(color: cs.outlineVariant),
+              const SizedBox(height: 12),
               _SectionTitle("Color"),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               ColorGridWidget(
                 colors: colorDots,
                 selectedName: state.colorName,
@@ -442,49 +441,33 @@ class _QtyPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1B1E24), // dark pill like the mock
+        color: isDark
+            ? cs.surfaceContainerHighest
+            : Color(0xFFF4F6F5), // dark pill like the mock
         borderRadius: BorderRadius.circular(28),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _RoundIcon(icon: Icons.remove, onTap: onDec),
+          RoundIconButtonWidget(icon: Icons.remove, onTap: onDec),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Text(
               '$value',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
             ),
           ),
-          _RoundIcon(icon: Icons.add, onTap: onInc),
+          RoundIconButtonWidget(icon: Icons.add, onTap: onInc),
         ],
-      ),
-    );
-  }
-}
-
-class _RoundIcon extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _RoundIcon({required this.icon, required this.onTap});
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      shape: const CircleBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: const SizedBox(
-          width: 36,
-          height: 36,
-          child: Icon(Icons.add),
-        )._with(icon),
       ),
     );
   }

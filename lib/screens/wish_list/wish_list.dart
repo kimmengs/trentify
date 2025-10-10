@@ -30,9 +30,9 @@ class _WishListPageState extends State<WishListPage> {
     final isDark = brightness == Brightness.dark;
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF111315),
+      backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF111315),
+        backgroundColor: isDark ? Colors.black : Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: Padding(

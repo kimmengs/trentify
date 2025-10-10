@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart'
@@ -261,14 +260,11 @@ class _FilterSheetState extends State<FilterSheet> {
 
                     _SectionTitle("Size"),
                     const SizedBox(height: 8),
-                    GridCirclesWidget<String>(
+                    GridCirclesWidget<String>.multi(
                       values: sizes,
-                      isSelected: (v) => state.sizes.contains(v),
-                      onTap: (v) {
-                        final s = {...state.sizes};
-                        s.contains(v) ? s.remove(v) : s.add(v);
-                        setState(() => state = state.copyWith(sizes: s));
-                      },
+                      selectedValues: state.sizes,
+                      onChangedMulti: (newSet) =>
+                          setState(() => state = state.copyWith(sizes: newSet)),
                       textPrimary: textPrimary,
                       border: border,
                       selectedFill: brand,

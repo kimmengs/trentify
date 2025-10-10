@@ -94,20 +94,6 @@ class _AddToCartPageState extends State<AddToCartPage> {
     setState(() => _items.removeWhere((e) => e.id == id));
   }
 
-  void _incQty(String id) {
-    setState(() {
-      final i = _items.indexWhere((e) => e.id == id);
-      if (i != -1) _items[i].qty += 1;
-    });
-  }
-
-  void _decQty(String id) {
-    setState(() {
-      final i = _items.indexWhere((e) => e.id == id);
-      if (i != -1 && _items[i].qty > 1) _items[i].qty -= 1;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -157,7 +143,9 @@ class _AddToCartPageState extends State<AddToCartPage> {
                           width: 26,
                           height: 26,
                           decoration: BoxDecoration(
-                            color: item.selected ? cs.primary : cs.surface,
+                            color: item.selected
+                                ? Color(0xFF528F65)
+                                : cs.surface,
                             shape: BoxShape.circle,
                             border: Border.all(color: cs.outlineVariant),
                           ),
@@ -176,29 +164,80 @@ class _AddToCartPageState extends State<AddToCartPage> {
                 const SizedBox(width: 12),
 
                 // details
+                // details + action rail (bounded by Expanded)
                 Expanded(
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // title + actions
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
+                      // DETAILS
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
                               item.title,
                               style: text.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
+                            const SizedBox(height: 6),
+                            Text('Size: ${item.size}', style: text.bodyMedium),
+                            const SizedBox(height: 2),
+                            Row(
+                              children: [
+                                Text(
+                                  'Color: ${item.colorName}',
+                                  style: text.bodyMedium,
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: item.color,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: cs.outlineVariant,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              children: [
+                                Text('Qty: ', style: text.bodyMedium),
+                                Text(
+                                  item.qty.toString(),
+                                  style: text.bodyMedium,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '\$${item.price.toStringAsFixed(2)}',
+                              style: text.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF528F65),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      // ACTION RAIL
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _ActionIcon(
                             tooltip: 'Edit',
-                            icon: const Icon(Icons.edit_outlined),
-                            onPressed: () async {
+                            icon: Icons.edit_outlined,
+                            onTap: () async {
                               final updated =
                                   await showBarModalBottomSheet<CartItem>(
                                     context: context,
@@ -206,7 +245,6 @@ class _AddToCartPageState extends State<AddToCartPage> {
                                     builder: (ctx) => EditCartItemSheet(
                                       initial: FilterResult.initial(),
                                       item: item,
-                                      // supply available options however you like:
                                       availableSizes: const [
                                         'XS',
                                         'S',
@@ -230,7 +268,6 @@ class _AddToCartPageState extends State<AddToCartPage> {
                                       ],
                                     ),
                                   );
-
                               if (updated != null) {
                                 setState(() {
                                   final i = _items.indexWhere(
@@ -241,57 +278,14 @@ class _AddToCartPageState extends State<AddToCartPage> {
                               }
                             },
                           ),
-                          IconButton(
+                          const SizedBox(height: 12),
+                          _ActionIcon(
                             tooltip: 'Remove',
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: Colors.redAccent,
-                            ),
-                            onPressed: () => _removeItem(item.id),
+                            icon: Icons.delete_outline,
+                            iconColor: Colors.redAccent,
+                            onTap: () => _removeItem(item.id),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text('Size: ${item.size}', style: text.bodyMedium),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text(
-                            'Color: ${item.colorName}',
-                            style: text.bodyMedium,
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: item.color,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: cs.outlineVariant),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text('Qty: ', style: text.bodyMedium),
-                          _QtyStepper(
-                            value: item.qty,
-                            onDecrement: () => _decQty(item.id),
-                            onIncrement: () => _incQty(item.id),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '\$${item.price.toStringAsFixed(2)}',
-                        style: text.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: const Color(
-                            0xFF528F65,
-                          ), // green like screenshot
-                        ),
                       ),
                     ],
                   ),
@@ -320,19 +314,15 @@ class _AddToCartPageState extends State<AddToCartPage> {
               Expanded(
                 flex: 2,
                 child: FilledButton(
-                  onPressed: _selectedCount == 0
-                      ? null
-                      : () {
-                          // TODO: route to checkout (go_router example):
-                          // context.pushNamed('checkout');
-                        },
+                  onPressed: _selectedCount == 0 ? null : () {},
                   style: FilledButton.styleFrom(
+                    backgroundColor: Color(0xFF528F65),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: const StadiumBorder(),
                   ),
                   child: Text(
                     'Checkout (${_selectedCount}) - \$${_selectedTotal.toStringAsFixed(2)}',
-                    style: const TextStyle(fontWeight: FontWeight.w800),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -344,72 +334,31 @@ class _AddToCartPageState extends State<AddToCartPage> {
   }
 }
 
-class _QtyStepper extends StatelessWidget {
-  final int value;
-  final VoidCallback onIncrement;
-  final VoidCallback onDecrement;
-  const _QtyStepper({
-    required this.value,
-    required this.onIncrement,
-    required this.onDecrement,
+class _ActionIcon extends StatelessWidget {
+  const _ActionIcon({
+    required this.tooltip,
+    required this.icon,
+    this.iconColor,
+    required this.onTap,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(left: 6),
-      decoration: ShapeDecoration(
-        color: cs.surfaceContainerHighest,
-        shape: const StadiumBorder(),
-      ),
-      child: Row(
-        children: [
-          _RoundIconButton(icon: Icons.remove, onTap: onDecrement),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              '$value',
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-          ),
-          _RoundIconButton(icon: Icons.add, onTap: onIncrement),
-        ],
-      ),
-    );
-  }
-}
-
-class _RoundIconButton extends StatelessWidget {
+  final String tooltip;
   final IconData icon;
+  final Color? iconColor;
   final VoidCallback onTap;
-  const _RoundIconButton({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Material(
-      color: cs.surface,
-      shape: const CircleBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: const SizedBox(
-          width: 32,
-          height: 32,
-          child: Icon(Icons.remove, size: 18),
-        ).withIcon(icon),
+    return Tooltip(
+      message: tooltip,
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(), // tight, no extra padding
+        iconSize: 22,
+        splashRadius: 18,
+        onPressed: onTap,
+        icon: Icon(icon, color: iconColor),
       ),
-    );
-  }
-}
-
-// tiny extension to reuse _RoundIconButton for add/remove
-extension on Widget {
-  Widget withIcon(IconData icon) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [this, Icon(icon, size: 18)],
     );
   }
 }
