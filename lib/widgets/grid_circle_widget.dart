@@ -109,7 +109,7 @@ class GridCirclesWidget<T> extends StatelessWidget {
               v.toString(),
               style: TextStyle(
                 color: selected ? Colors.white : textPrimary,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

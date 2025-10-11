@@ -34,7 +34,7 @@ class TransactionTileAndroid extends StatelessWidget {
                   Text(
                     tx.name,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 2),

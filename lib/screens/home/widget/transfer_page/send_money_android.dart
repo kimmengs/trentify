@@ -58,7 +58,7 @@ class _SendMoneyMaterialState extends State<SendMoneyMaterial> {
                 p.name,
                 style: TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: null,
                 ),
               ),
@@ -151,7 +151,7 @@ class _SendMoneyMaterialState extends State<SendMoneyMaterial> {
         const SizedBox(height: 20),
         const Text(
           'Add a note (optional)',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         noteField,

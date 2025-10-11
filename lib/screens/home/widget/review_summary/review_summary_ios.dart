@@ -62,7 +62,7 @@ class ReviewSummaryCupertino extends StatelessWidget {
                   payee.name,
                   style: const TextStyle(
                     fontSize: 22,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -113,7 +113,7 @@ class ReviewSummaryCupertino extends StatelessWidget {
             // ---- Payment Type ----
             const Text(
               'Payment Type',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Container(
@@ -142,7 +142,7 @@ class ReviewSummaryCupertino extends StatelessWidget {
             // ---- Notes ----
             const Text(
               'Notes',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
@@ -188,7 +188,7 @@ class _SummaryRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = TextStyle(
       fontSize: 18,
-      fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+      fontWeight: bold ? FontWeight.w600 : FontWeight.w500,
     );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

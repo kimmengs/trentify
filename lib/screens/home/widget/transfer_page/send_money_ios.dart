@@ -59,7 +59,7 @@ class _SendMoneyCupertinoState extends State<SendMoneyCupertino> {
                         p.name,
                         style: const TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -133,7 +133,7 @@ class _SendMoneyCupertinoState extends State<SendMoneyCupertino> {
             const SizedBox(height: 20),
             const Text(
               'Add a note (optional)',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             CupertinoTextField(

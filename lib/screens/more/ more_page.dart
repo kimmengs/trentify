@@ -172,7 +172,7 @@ class _MoreItem extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: titleColor,
                 ),
               ),

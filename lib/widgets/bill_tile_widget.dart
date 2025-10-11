@@ -32,7 +32,7 @@ class BillTileWidget extends StatelessWidget {
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 16,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: CupertinoColors.label,
           ),
         ),

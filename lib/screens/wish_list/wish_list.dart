@@ -44,7 +44,7 @@ class _WishListPageState extends State<WishListPage> {
         ),
         title: const Text(
           'Wishlist (25)',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          style: TextStyle(fontWeight: FontWeight.w600),
         ),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.search)),

@@ -5,6 +5,7 @@ import 'package:trentify/model/demodb.dart';
 import 'package:trentify/screens/home/widget/category_pill_widget.dart';
 import 'package:trentify/screens/home/widget/horizontal_products.dart';
 import 'package:trentify/screens/home/widget/search_fill_widget.dart';
+import 'package:trentify/widgets/section_header_widget.dart';
 
 class TrendifyHomeCupertino extends StatefulWidget {
   const TrendifyHomeCupertino({super.key});
@@ -83,7 +84,10 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              child: const _SectionHeader(title: 'Categories'),
+              child: const SectionHeader(
+                title: 'Categories',
+                variant: SectionHeaderVariant.materialAction,
+              ),
             ),
           ),
           SliverGrid(
@@ -113,9 +117,11 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-              child: const _SectionHeader(
+              child: SectionHeader(
                 title: 'New Arrival',
-                action: 'View All',
+                onAction: () {
+                  /* navigate */
+                },
               ),
             ),
           ),
@@ -130,9 +136,9 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-              child: const _SectionHeader(
+              child: SectionHeader(
                 title: 'Hot Deals This Week',
-                action: 'View All',
+                onAction: () {},
               ),
             ),
           ),
@@ -381,47 +387,6 @@ class _CategoryTile extends StatelessWidget {
     );
   }
 }
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final String? action;
-  const _SectionHeader({required this.title, this.action});
-
-  @override
-  Widget build(BuildContext context) {
-    final base = CupertinoTheme.of(context).textTheme.navTitleTextStyle;
-    return Row(
-      children: [
-        Text(title, style: base.copyWith(fontWeight: FontWeight.w700)),
-        const Spacer(),
-        if (action != null)
-          CupertinoButton(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            onPressed: () {},
-            child: Row(
-              children: const [
-                Text(
-                  'View All',
-                  style: TextStyle(
-                    color: Color(0xFF528F65),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(width: 4),
-                Icon(
-                  CupertinoIcons.arrow_right_circle,
-                  size: 18,
-                  color: Color(0xFF528F65),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-
 
 class _CategoryImage extends StatelessWidget {
   final String? pathOrUrl;

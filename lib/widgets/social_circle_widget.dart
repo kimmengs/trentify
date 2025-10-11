@@ -24,7 +24,7 @@ class SocialCircleWidget extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         label,
-        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
       ),
     );
   }

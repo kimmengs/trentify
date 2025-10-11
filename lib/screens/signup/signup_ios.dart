@@ -127,7 +127,7 @@ class _SignUpPageCupertinoState extends State<SignUpPageCupertino> {
               const Text(
                 'Create New Account',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 24),
 

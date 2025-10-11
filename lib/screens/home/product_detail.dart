@@ -1,7 +1,45 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trentify/model/demodb.dart';
+import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/screens/home/widget/horizontal_products.dart';
+import 'package:trentify/screens/home/widget/review_tile_widget.dart';
+import 'package:trentify/screens/home/widget/tag_widget.dart';
+import 'package:trentify/screens/home/widget/voucher_chip_widget.dart';
+import 'package:trentify/widgets/color_grid_widget.dart';
+import 'package:trentify/widgets/grid_circle_widget.dart';
+import 'package:trentify/widgets/section_header_widget.dart';
+
+final colorDots = const <String, Color>{
+  "Black": Color(0xFF111214),
+  "White": Color(0xFFFFFFFF),
+  "Red": Color(0xFFE74B3C),
+  "Pink": Color(0xFFF64D86),
+  "Purple": Color(0xFF8E39C1),
+  "Deep Purple": Color(0xFF6B2BB0),
+};
+
+final sizes = const [
+  "XXS",
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "35",
+  "36",
+  "37",
+  "38",
+  "39",
+  "40",
+  "41",
+  "42",
+  "43",
+  "44",
+  "45",
+];
 
 /// --- DATA MODEL YOU CAN MAP FROM YOUR EXISTING PRODUCT ---
 @immutable
@@ -82,14 +120,21 @@ class VoucherData {
 
 /// --- PAGE ---
 class ProductDetailPage extends StatefulWidget {
+  final FilterResult initial;
   final ProductDetailData data;
-  const ProductDetailPage({super.key, required this.data});
+  const ProductDetailPage({
+    super.key,
+    required this.data,
+    required this.initial,
+  });
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
+  late String _size;
+  late FilterResult state;
   final _pageController = PageController();
   int _imageIndex = 0;
 
@@ -97,12 +142,29 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   int _selectedColor = 0;
 
   bool _descExpanded = false;
+  bool get isDark =>
+      MediaQuery.of(context).platformBrightness == Brightness.dark;
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
+
+  @override
+  void initState() {
+    super.initState();
+    state = widget.initial;
+    _size = 'S';
+  }
+
+  Color get brand => const Color(0xFF528F65);
+  Color get textPrimary =>
+      isDark ? CupertinoColors.white : CupertinoColors.black;
+  Color get textSecondary =>
+      isDark ? CupertinoColors.systemGrey2 : CupertinoColors.systemGrey;
+  Color get border =>
+      isDark ? const Color(0xFF2A2D31) : const Color(0x11000000);
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +201,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   Text(
                     widget.data.title,
                     style: text.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -148,11 +210,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       Text(
                         '\$${widget.data.price.toStringAsFixed(2)}',
                         style: text.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      _Tag(
+                      TagWidget(
                         text: '${_formatNumber(widget.data.soldCount)} sold',
                       ),
                       const SizedBox(width: 8),
@@ -171,66 +233,96 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   const SizedBox(height: 16),
 
                   // Vouchers
-                  _SectionHeader(
+                  SectionHeader(
                     title: 'Vouchers Available',
-                    onViewAll: widget.data.vouchers.isNotEmpty ? () {} : null,
+                    onAction: () {
+                      /* navigate */
+                    },
                   ),
+
                   if (widget.data.vouchers.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: widget.data.vouchers
-                          .map((v) => _VoucherChip(v))
+                          .map((v) => VoucherChipWidget(v))
                           .toList(),
                     ),
                     const SizedBox(height: 16),
                   ],
 
                   // Size
-                  _SectionHeader(title: 'Size'),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 10,
-                    children: List.generate(widget.data.sizes.length, (i) {
-                      final selected = _selectedSize == i;
-                      return ChoiceChip(
-                        label: Text(widget.data.sizes[i]),
-                        selected: selected,
-                        onSelected: (_) => setState(() => _selectedSize = i),
-                        shape: const StadiumBorder(),
-                        labelStyle: text.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      );
-                    }),
+                  SectionHeader(
+                    title: "Size",
+                    variant: SectionHeaderVariant.materialAction,
                   ),
+                  const SizedBox(height: 8),
+                  SectionHeader(
+                    title: "Size",
+                    variant: SectionHeaderVariant.materialAction,
+                  ),
+                  const SizedBox(height: 8),
+
+                  GridCirclesWidget<String>.single(
+                    values: sizes,
+                    selectedValue: _size,
+                    onChanged: (v) => setState(() => _size = v),
+                    textPrimary: textPrimary,
+                    border: border,
+                    selectedFill: brand,
+                  ),
+
+                  // Wrap(
+                  //   spacing: 10,
+                  //   children: List.generate(widget.data.sizes.length, (i) {
+                  //     final selected = _selectedSize == i;
+                  //     return ChoiceChip(
+                  //       label: Text(widget.data.sizes[i]),
+                  //       selected: selected,
+                  //       onSelected: (_) => setState(() => _selectedSize = i),
+                  //       shape: const StadiumBorder(),
+                  //       labelStyle: text.bodyMedium?.copyWith(
+                  //         fontWeight: FontWeight.w600,
+                  //       ),
+                  //     );
+                  //   }),
+                  // ),
                   const SizedBox(height: 16),
 
                   // Color
-                  _SectionHeader(title: 'Color'),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 12,
-                    children: List.generate(widget.data.colors.length, (i) {
-                      final selected = _selectedColor == i;
-                      return _ColorDot(
-                        color: widget.data.colors[i],
-                        selected: selected,
-                        onTap: () => setState(() => _selectedColor = i),
-                      );
-                    }),
+                  SectionHeader(
+                    title: "Color",
+                    variant: SectionHeaderVariant.materialAction,
                   ),
+                  const SizedBox(height: 10),
+
+                  ColorGridWidget(
+                    colors: colorDots,
+                    selectedName: state.colorName,
+                    onPick: (name) =>
+                        setState(() => state = state.copyWith(colorName: name)),
+                    textPrimary: textPrimary,
+                    border: border,
+                  ),
+
                   const SizedBox(height: 16),
 
                   // Product info (specs)
-                  _SectionHeader(title: 'Product Information'),
+                  SectionHeader(
+                    title: "Product Information",
+                    variant: SectionHeaderVariant.materialAction,
+                  ),
                   const SizedBox(height: 8),
                   _SpecTable(specs: widget.data.specs),
                   const SizedBox(height: 16),
 
                   // Description
-                  _SectionHeader(title: 'Description'),
+                  SectionHeader(
+                    title: "Description",
+                    variant: SectionHeaderVariant.materialAction,
+                  ),
+
                   const SizedBox(height: 6),
                   _ExpandableText(
                     text: widget.data.description,
@@ -241,7 +333,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   const SizedBox(height: 16),
 
                   // Rating summary + histogram
-                  _SectionHeader(title: 'Rating & Reviews', onViewAll: () {}),
+                  SectionHeader(
+                    title: 'Rating & Reviews',
+                    onAction: () {
+                      /* navigate */
+                    },
+                  ),
                   const SizedBox(height: 10),
                   _RatingSummary(
                     average: widget.data.rating,
@@ -259,16 +356,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             SliverList.separated(
               itemCount: widget.data.reviews.length,
               separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (_, i) => _ReviewTile(widget.data.reviews[i]),
+              itemBuilder: (_, i) => ReviewTileWidget(widget.data.reviews[i]),
             ),
 
           // Suggestions
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-              child: _SectionHeader(
-                title: 'You May Also Like',
-                onViewAll: () {},
+              child: SectionHeader(
+                title: 'You may also like',
+                onAction: () {
+                  /* navigate */
+                },
               ),
             ),
           ),
@@ -287,8 +386,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       // Sticky bottom bar
       bottomNavigationBar: SafeArea(
         top: false,
+        bottom: false,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 26),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             boxShadow: const [
@@ -325,7 +425,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
                   child: const Text(
                     'Buy Now',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -337,10 +437,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: const Color(0xFF528F65),
                   ),
                   child: const Text(
                     'Add to Cart',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -391,7 +492,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     child: Text(
                       '${_imageIndex + 1}/${widget.data.images.length}',
                       style: TextStyle(
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: isDark ? Colors.white : Colors.black,
                       ),
                     ),
@@ -407,88 +508,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 }
 
 /// --- SMALL UI PIECES ---
-
-class _Tag extends StatelessWidget {
-  final String text;
-  const _Tag({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: ShapeDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        shape: const StadiumBorder(),
-      ),
-      child: Text(text, style: Theme.of(context).textTheme.labelMedium),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final VoidCallback? onViewAll;
-  const _SectionHeader({required this.title, this.onViewAll});
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-        ),
-        if (onViewAll != null)
-          TextButton.icon(
-            onPressed: onViewAll,
-            icon: const Icon(Icons.arrow_forward, size: 16),
-            label: const Text('View All'),
-          ),
-      ],
-    );
-  }
-}
-
-class _VoucherChip extends StatelessWidget {
-  final VoucherData v;
-  const _VoucherChip(this.v);
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.outlineVariant),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.local_offer_outlined, size: 16),
-          const SizedBox(width: 6),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                v.label,
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-              Text(
-                '${v.code} · ${v.details}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _ColorDot extends StatelessWidget {
   final Color color;
   final bool selected;
@@ -629,7 +648,7 @@ class _RatingSummary extends StatelessWidget {
           children: [
             Text(
               average.toStringAsFixed(1),
-              style: text.displaySmall?.copyWith(fontWeight: FontWeight.w700),
+              style: text.displaySmall?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 4),
             Row(
@@ -659,143 +678,6 @@ class _RatingSummary extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ReviewTile extends StatelessWidget {
-  final ReviewData r;
-  const _ReviewTile(this.r);
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 18,
-                backgroundImage: AssetImage('assets/images/avatar/01.png'),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      r.author,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                    Text(r.ago, style: text.bodySmall),
-                  ],
-                ),
-              ),
-              IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: List.generate(5, (i) {
-              final filled = i < r.stars.round();
-              return Icon(filled ? Icons.star : Icons.star_border, size: 16);
-            }),
-          ),
-          const SizedBox(height: 6),
-          Text('Variant : ${r.variant}', style: text.bodySmall),
-          const SizedBox(height: 8),
-          Text(r.text),
-          if (r.photos.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 80,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: r.photos.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (_, i) => ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    r.photos[i],
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _SuggestionCard extends StatelessWidget {
-  final SuggestionData s;
-  const _SuggestionCard(this.s);
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return SizedBox(
-      width: 140,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AspectRatio(
-            aspectRatio: 3 / 4,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Image.network(s.image, fit: BoxFit.cover),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: DecoratedBox(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white70,
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.favorite_border),
-                        onPressed: () {},
-                        iconSize: 18,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints.tightFor(
-                          width: 32,
-                          height: 32,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(s.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              const Icon(Icons.star, size: 14),
-              const SizedBox(width: 3),
-              Text(s.rating.toStringAsFixed(1), style: text.labelMedium),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '\$${s.price.toStringAsFixed(2)}',
-            style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -25,7 +25,7 @@ class ThemeSettingsPage extends StatelessWidget {
       children: [
         const Text(
           'Appearance',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         _SegControl<AppThemeMode>(
@@ -40,7 +40,7 @@ class ThemeSettingsPage extends StatelessWidget {
         const SizedBox(height: 24),
         const Text(
           'Brand color',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         Wrap(

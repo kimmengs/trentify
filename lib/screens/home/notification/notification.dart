@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trentify/widgets/section_header_widget.dart';
 
 enum NoticeTab { general, promotions }
 
@@ -163,13 +164,14 @@ class _NotificationPageState extends State<NotificationPage> {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
               children: [
                 if (today.isNotEmpty) ...[
-                  _SectionHeader('Today'),
+                  const SectionHeader.divider(title: 'Today'),
+
                   const SizedBox(height: 8),
                   ...today.map((n) => _NoticeTile(item: n)),
                   const SizedBox(height: 16),
                 ],
                 if (yesterday.isNotEmpty) ...[
-                  _SectionHeader('Yesterday'),
+                  const SectionHeader.divider(title: 'Yesterday'),
                   const SizedBox(height: 8),
                   ...yesterday.map((n) => _NoticeTile(item: n)),
                 ],
@@ -222,7 +224,7 @@ class _SegmentChip extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: selected ? Colors.white : cs.onSurface,
                 ),
               ),
@@ -230,27 +232,6 @@ class _SegmentChip extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  const _SectionHeader(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    final divider = Theme.of(context).dividerColor.withOpacity(0.4);
-    return Row(
-      children: [
-        Text(
-          title,
-          style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(width: 8),
-        Expanded(child: Divider(color: divider, thickness: 1)),
-      ],
     );
   }
 }

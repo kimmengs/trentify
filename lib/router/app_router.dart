@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:trentify/model/demodb.dart';
+import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/screens/home/category/category.dart';
 import 'package:trentify/screens/home/home_ios.dart';
 import 'package:trentify/screens/home/notification/notification.dart';
@@ -54,7 +55,12 @@ GoRouter createRouter({required String initialLocation}) {
               child: Scaffold(body: Center(child: Text('Not found'))),
             );
           }
-          return CupertinoPage(child: ProductDetailPage(data: data));
+          return CupertinoPage(
+            child: ProductDetailPage(
+              data: data,
+              initial: FilterResult.initial(),
+            ),
+          );
         },
       ),
       GoRoute(

@@ -402,7 +402,7 @@ class _PillButton extends StatelessWidget {
           label,
           style: TextStyle(
             color: fg,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             fontSize: 16,
           ),
         ),

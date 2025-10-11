@@ -27,7 +27,7 @@ class QtyStepperWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Text(
               '$value',
-              style: const TextStyle(fontWeight: FontWeight.w700),
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
           RoundIconButtonWidget(icon: Icons.add, onTap: onIncrement),

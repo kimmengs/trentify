@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/provider/product_provider.dart';
 import 'package:trentify/screens/home/product_detail.dart';
 
@@ -27,7 +28,10 @@ class ProductDetailLoader extends StatelessWidget {
             onRetry: () => (context as Element).markNeedsBuild(),
           );
         }
-        return ProductDetailPage(data: snap.data!);
+        return ProductDetailPage(
+          data: snap.data!,
+          initial: FilterResult.initial(),
+        );
       },
     );
   }

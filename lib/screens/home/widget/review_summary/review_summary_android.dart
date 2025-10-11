@@ -42,7 +42,7 @@ class ReviewSummaryMaterial extends StatelessWidget {
           payee.name,
           style: TextStyle(
             fontSize: 22,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: null,
           ),
         ),
@@ -91,7 +91,7 @@ class ReviewSummaryMaterial extends StatelessWidget {
       children: [
         const Text(
           'Notes',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         Text(
@@ -123,7 +123,7 @@ class ReviewSummaryMaterial extends StatelessWidget {
         const SizedBox(height: 28),
         const Text(
           'Payment Type',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         paymentType,
@@ -157,7 +157,7 @@ class _SummaryRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = TextStyle(
       fontSize: 18,
-      fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+      fontWeight: bold ? FontWeight.w600 : FontWeight.w500,
     );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

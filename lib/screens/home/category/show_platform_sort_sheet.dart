@@ -44,7 +44,7 @@ Future<SortOption?> showPlatformSortSheet(
           'Sort',
           style: TextStyle(
             fontSize: 20,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : Colors.black,
           ),
         ),
@@ -101,7 +101,7 @@ Future<SortOption?> showPlatformSortSheet(
               const ListTile(
                 title: Text(
                   'Sort',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
               const Divider(height: 0),

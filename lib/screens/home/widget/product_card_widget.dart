@@ -109,7 +109,7 @@ class ProductCardWidget extends StatelessWidget {
                             '\$${product.price.toStringAsFixed(2)}',
                             style: const TextStyle(
                               color: priceColor,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
                           ),

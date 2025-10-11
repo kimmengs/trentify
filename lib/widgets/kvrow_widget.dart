@@ -21,7 +21,7 @@ class KVRowWidget extends StatelessWidget {
     const kStyle = TextStyle(color: CupertinoColors.systemGrey, fontSize: 16);
     final vStyle = TextStyle(
       fontSize: 16,
-      fontWeight: boldV ? FontWeight.w700 : FontWeight.w600,
+      fontWeight: boldV ? FontWeight.w600 : FontWeight.w600,
     );
 
     return Row(
