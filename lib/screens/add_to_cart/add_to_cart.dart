@@ -3,6 +3,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/model/name_color.dart';
 import 'package:trentify/screens/add_to_cart/edit_cart_item_sheet_widget.dart';
+import 'package:trentify/widgets/adaptive_button_style_widget.dart';
 
 class CartItem {
   final String id;
@@ -313,17 +314,16 @@ class _AddToCartPageState extends State<AddToCartPage> {
             children: [
               Expanded(
                 flex: 2,
-                child: FilledButton(
-                  onPressed: _selectedCount == 0 ? null : () {},
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Color(0xFF528F65),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: const StadiumBorder(),
-                  ),
-                  child: Text(
-                    'Checkout (${_selectedCount}) - \$${_selectedTotal.toStringAsFixed(2)}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
+                child: AdaptiveActionButton(
+                  label:
+                      'Checkout (${_selectedCount}) - \$${_selectedTotal.toStringAsFixed(2)}',
+                  style: AdaptiveButtonStyle.filled,
+                  onPressed: () {
+                    // TODO: Add to cart
+                  },
+                  color: const Color(0xFF528F65),
+                  expanded: true,
+                  height: 48,
                 ),
               ),
             ],

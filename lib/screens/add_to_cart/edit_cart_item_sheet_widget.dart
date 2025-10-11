@@ -6,6 +6,7 @@ import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/model/name_color.dart';
 import 'package:trentify/screens/add_to_cart/add_to_cart.dart';
 import 'package:trentify/screens/home/widget/round_icon_button_widget.dart';
+import 'package:trentify/widgets/adaptive_button_style_widget.dart';
 import 'package:trentify/widgets/color_grid_widget.dart';
 import 'package:trentify/widgets/grid_circle_widget.dart';
 
@@ -227,27 +228,22 @@ class _EditCartItemSheetState extends State<EditCartItemSheet> {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
+                    child: AdaptiveActionButton(
+                      label: 'Cancel',
+                      style: AdaptiveButtonStyle.outlined,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      color: const Color(0xFF528F65),
+                      expanded: true,
+                      height: 48, // tighter height to match pill buttons in UI
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF5C8F62),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
+                    child: AdaptiveActionButton(
+                      label: 'Confirm',
+                      style: AdaptiveButtonStyle.filled,
                       onPressed: () {
                         Navigator.pop(
                           context,
@@ -264,7 +260,9 @@ class _EditCartItemSheetState extends State<EditCartItemSheet> {
                           ),
                         );
                       },
-                      child: const Text('Confirm'),
+                      color: const Color(0xFF528F65),
+                      expanded: true,
+                      height: 48,
                     ),
                   ),
                 ],

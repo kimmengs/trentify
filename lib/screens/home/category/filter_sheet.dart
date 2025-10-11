@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart'
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:trentify/model/filter_result.dart';
+import 'package:trentify/widgets/adaptive_button_style_widget.dart';
 import 'package:trentify/widgets/color_grid_widget.dart';
 import 'package:trentify/widgets/grid_circle_widget.dart';
 
@@ -142,7 +143,7 @@ class _FilterSheetState extends State<FilterSheet> {
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -298,23 +299,31 @@ class _FilterSheetState extends State<FilterSheet> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: _PillButton(
-                        label: "Reset",
-                        onTap: () =>
-                            setState(() => state = FilterResult.cleared()),
-                        bg: isDark
+                      child: AdaptiveActionButton(
+                        label: 'Reset',
+                        style: AdaptiveButtonStyle.outlined,
+                        onPressed: () {
+                          setState(() => state = FilterResult.cleared());
+                        },
+                        color: !isDark
                             ? const Color(0xFF232629)
                             : const Color(0xFFECEDEE),
-                        fg: textPrimary,
+                        expanded: true,
+                        height:
+                            48, // tighter height to match pill buttons in UI
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _PillButton(
-                        label: "Apply",
-                        onTap: () => Navigator.pop(context, state),
-                        bg: brand,
-                        fg: Colors.white,
+                      child: AdaptiveActionButton(
+                        label: 'Apply',
+                        style: AdaptiveButtonStyle.filled,
+                        onPressed: () {
+                          Navigator.pop(context, state);
+                        },
+                        color: const Color(0xFF528F65),
+                        expanded: true,
+                        height: 48,
                       ),
                     ),
                   ],

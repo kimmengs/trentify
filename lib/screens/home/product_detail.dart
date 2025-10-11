@@ -1,15 +1,21 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:trentify/helper/format_number.dart';
 import 'package:trentify/model/demodb.dart';
 import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/screens/home/widget/horizontal_products.dart';
+import 'package:trentify/screens/home/widget/rating_summary_widget.dart';
 import 'package:trentify/screens/home/widget/review_tile_widget.dart';
 import 'package:trentify/screens/home/widget/tag_widget.dart';
 import 'package:trentify/screens/home/widget/voucher_chip_widget.dart';
+import 'package:trentify/widgets/adaptive_button_style_widget.dart';
+import 'package:trentify/widgets/circle_icon_button_widget.dart';
 import 'package:trentify/widgets/color_grid_widget.dart';
+import 'package:trentify/widgets/expandable_text_widget.dart';
 import 'package:trentify/widgets/grid_circle_widget.dart';
 import 'package:trentify/widgets/section_header_widget.dart';
+import 'package:trentify/widgets/spec_table_widget.dart';
 
 final colorDots = const <String, Color>{
   "Black": Color(0xFF111214),
@@ -215,7 +221,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                       const SizedBox(width: 12),
                       TagWidget(
-                        text: '${_formatNumber(widget.data.soldCount)} sold',
+                        text: '${formatNumber(widget.data.soldCount)} sold',
                       ),
                       const SizedBox(width: 8),
                       Row(
@@ -273,21 +279,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     selectedFill: brand,
                   ),
 
-                  // Wrap(
-                  //   spacing: 10,
-                  //   children: List.generate(widget.data.sizes.length, (i) {
-                  //     final selected = _selectedSize == i;
-                  //     return ChoiceChip(
-                  //       label: Text(widget.data.sizes[i]),
-                  //       selected: selected,
-                  //       onSelected: (_) => setState(() => _selectedSize = i),
-                  //       shape: const StadiumBorder(),
-                  //       labelStyle: text.bodyMedium?.copyWith(
-                  //         fontWeight: FontWeight.w600,
-                  //       ),
-                  //     );
-                  //   }),
-                  // ),
                   const SizedBox(height: 16),
 
                   // Color
@@ -314,7 +305,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     variant: SectionHeaderVariant.materialAction,
                   ),
                   const SizedBox(height: 8),
-                  _SpecTable(specs: widget.data.specs),
+                  SpecTableWidget(specs: widget.data.specs),
                   const SizedBox(height: 16),
 
                   // Description
@@ -324,7 +315,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
 
                   const SizedBox(height: 6),
-                  _ExpandableText(
+                  ExpandableTextWidget(
                     text: widget.data.description,
                     expanded: _descExpanded,
                     onToggle: () =>
@@ -340,7 +331,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  _RatingSummary(
+                  RatingSummaryWidget(
                     average: widget.data.rating,
                     totalRatings: 2238,
                     totalReviews: 941,
@@ -388,61 +379,74 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         top: false,
         bottom: false,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 26),
+          height: 78, // consistent height like the design
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             boxShadow: const [
               BoxShadow(
                 color: Color(0x14000000),
-                blurRadius: 12,
+                blurRadius: 10,
                 offset: Offset(0, -2),
               ),
             ],
           ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _CircleIconButton(
-                icon: Icons.chat_bubble_outline,
-                onTap: () {
-                  /* TODO: Chat */
-                },
+              // -------- Left action icons --------
+              Row(
+                children: [
+                  CircleIconButtonWidget(
+                    icon: Icons.shop_rounded,
+                    onTap: () {
+                      // TODO: Chat
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  CircleIconButtonWidget(
+                    icon: Icons.favorite_border,
+                    onTap: () {
+                      // TODO: Wishlist toggle
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              _CircleIconButton(
-                icon: Icons.favorite_border,
-                onTap: () {
-                  /* TODO: Wishlist toggle */
-                },
-              ),
-              const SizedBox(width: 12),
+
+              const SizedBox(width: 16),
+
+              // -------- Buy Now + Add to Cart --------
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    /* TODO: Buy now */
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: const Text(
-                    'Buy Now',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton(
-                  onPressed: () {
-                    /* TODO: Add to cart */
-                  },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: const Color(0xFF528F65),
-                  ),
-                  child: const Text(
-                    'Add to Cart',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: AdaptiveActionButton(
+                        label: 'Buy Now',
+                        style: AdaptiveButtonStyle.outlined,
+                        onPressed: () {
+                          // TODO: Buy now
+                        },
+                        color: const Color(0xFF528F65),
+                        expanded: true,
+                        height:
+                            48, // tighter height to match pill buttons in UI
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: AdaptiveActionButton(
+                        label: 'Add to Cart',
+                        style: AdaptiveButtonStyle.filled,
+                        onPressed: () {
+                          // TODO: Add to cart
+                        },
+                        color: const Color(0xFF528F65),
+                        expanded: true,
+                        height: 48,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -508,203 +512,3 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 }
 
 /// --- SMALL UI PIECES ---
-class _ColorDot extends StatelessWidget {
-  final Color color;
-  final bool selected;
-  final VoidCallback onTap;
-  const _ColorDot({
-    required this.color,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: 36,
-        height: 36,
-        padding: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: selected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).dividerColor,
-            width: selected ? 2 : 1,
-          ),
-        ),
-        child: DecoratedBox(
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-      ),
-    );
-  }
-}
-
-class _SpecTable extends StatelessWidget {
-  final Map<String, String> specs;
-  const _SpecTable({required this.specs});
-
-  @override
-  Widget build(BuildContext context) {
-    final rows = specs.entries.map((e) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 110,
-              child: Text(
-                e.key,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            const Text(':  '),
-            Expanded(child: Text(e.value)),
-          ],
-        ),
-      );
-    }).toList();
-
-    return Column(children: rows);
-  }
-}
-
-class _ExpandableText extends StatelessWidget {
-  final String text;
-  final bool expanded;
-  final VoidCallback onToggle;
-  const _ExpandableText({
-    required this.text,
-    required this.expanded,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodyMedium;
-    final max = expanded ? null : 3;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          text,
-          maxLines: max,
-          overflow: expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-          style: style,
-        ),
-        const SizedBox(height: 6),
-        GestureDetector(
-          onTap: onToggle,
-          child: Text(
-            expanded ? 'read less' : 'read more…',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _RatingSummary extends StatelessWidget {
-  final double average;
-  final int totalRatings;
-  final int totalReviews;
-  const _RatingSummary({
-    required this.average,
-    required this.totalRatings,
-    required this.totalReviews,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    Widget bar(int stars, double fraction) {
-      return Row(
-        children: [
-          SizedBox(width: 16, child: Text('$stars', style: text.labelMedium)),
-          const SizedBox(width: 6),
-          Expanded(child: LinearProgressIndicator(value: fraction)),
-        ],
-      );
-    }
-
-    // demo fractions; replace with real distribution
-    final dist = [0.75, 0.16, 0.05, 0.03, 0.01];
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // left: average + stars
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              average.toStringAsFixed(1),
-              style: text.displaySmall?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: List.generate(5, (i) {
-                final filled = i < average.round();
-                return Icon(filled ? Icons.star : Icons.star_border, size: 18);
-              }),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              '${_formatNumber(totalRatings)} rating • ${_formatNumber(totalReviews)} reviews',
-              style: text.bodySmall,
-            ),
-          ],
-        ),
-        const SizedBox(width: 16),
-        // right: histogram
-        Expanded(
-          child: Column(
-            children: List.generate(
-              5,
-              (i) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 3),
-                child: bar(5 - i, dist[i]),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CircleIconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _CircleIconButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Material(
-      color: cs.surfaceContainerHighest,
-      shape: const CircleBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: SizedBox(width: 44, height: 44, child: Icon(icon)),
-      ),
-    );
-  }
-}
-
-/// --- HELPERS ---
-String _formatNumber(int n) {
-  if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
-  if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
-  return '$n';
-}
