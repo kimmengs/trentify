@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/model/name_color.dart';
+import 'package:trentify/router/app_routes.dart';
 import 'package:trentify/screens/add_to_cart/edit_cart_item_sheet_widget.dart';
 import 'package:trentify/widgets/adaptive_button_style_widget.dart';
 
@@ -318,9 +320,19 @@ class _AddToCartPageState extends State<AddToCartPage> {
                   label:
                       'Checkout (${_selectedCount}) - \$${_selectedTotal.toStringAsFixed(2)}',
                   style: AdaptiveButtonStyle.filled,
-                  onPressed: () {
-                    // TODO: Add to cart
-                  },
+                  // In AddToCartPage bottomNavigationBar button onPressed:
+                  onPressed: _selectedCount == 0
+                      ? null
+                      : () {
+                          final selectedItems = _items
+                              .where((e) => e.selected)
+                              .toList();
+
+                          context.push(
+                            AppRoutes.checkout,
+                            extra: selectedItems,
+                          );
+                        },
                   color: const Color(0xFF528F65),
                   expanded: true,
                   height: 48,

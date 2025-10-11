@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:trentify/screens/add_to_cart/add_to_cart.dart';
 import 'package:trentify/screens/home/home.dart';
 import 'package:trentify/screens/more/%20more_page.dart';
@@ -17,6 +18,15 @@ class _HomeShellCupertinoState extends State<HomeShellCupertino> {
   int _index = 0;
   final _visited = <bool>[true, false, false, false, false];
   final _pages = <Widget?>[null, null, null, null, null];
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final state = GoRouterState.of(context);
+    final extra = state.extra;
+    if (extra is Map && extra['tabIndex'] is int) {
+      _index = extra['tabIndex'] as int;
+    }
+  }
 
   Widget _buildPage(int i) {
     switch (i) {

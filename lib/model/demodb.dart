@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:trentify/model/address.dart';
+import 'package:trentify/model/payment_method.dart';
 import 'package:trentify/model/product.dart';
+import 'package:trentify/model/promo.dart';
 import 'package:trentify/screens/home/home_ios.dart';
 import 'package:trentify/screens/home/product_detail.dart';
 import 'package:flutter/material.dart';
@@ -332,6 +335,114 @@ class DemoDb {
       price: 140,
       rating: 4.6,
       imageUrl: 'assets/images/demo/03.jpeg',
+    ),
+  ];
+
+  static const addresses = <Address>[
+    Address(
+      id: 'home',
+      label: 'Home',
+      fullName: 'Andrew Ainsley',
+      phone: '+1 111 467 378 399',
+      line1: '701 7th Ave, New York, NY 10036, USA',
+      isMain: true,
+    ),
+    Address(
+      id: 'apartment',
+      label: 'Apartment',
+      fullName: 'Andrew Ainsley',
+      phone: '+1 111 467 378 399',
+      line1: 'Liberty Island, New York, NY 10004, USA',
+    ),
+    Address(
+      id: 'mom',
+      label: "Mom's House",
+      fullName: 'Jenny Ainsley',
+      phone: '+1 111 684 049 365',
+      line1: 'Central Park, New York, NY 10022, USA',
+    ),
+  ];
+
+  static const demoMethods = <PaymentMethod>[
+    const PaymentMethod(id: 'paypal', kind: PaymentKind.wallet, name: 'PayPal'),
+    const PaymentMethod(
+      id: 'gpay',
+      kind: PaymentKind.wallet,
+      name: 'Google Pay',
+    ),
+    const PaymentMethod(
+      id: 'apple',
+      kind: PaymentKind.wallet,
+      name: 'Apple Pay',
+    ),
+    const PaymentMethod(
+      id: 'mc4679',
+      kind: PaymentKind.card,
+      name: 'Mastercard',
+      brand: 'Mastercard',
+      last4: '4679',
+    ),
+    const PaymentMethod(
+      id: 'visa5567',
+      kind: PaymentKind.card,
+      name: 'Visa',
+      brand: 'Visa',
+      last4: '5567',
+    ),
+    const PaymentMethod(
+      id: 'amex8456',
+      kind: PaymentKind.card,
+      name: 'American Express',
+      brand: 'AmEx',
+      last4: '8456',
+    ),
+  ];
+
+  static final demoPromos = <Promo>[
+    Promo(
+      id: 'p1',
+      title: '10% OFF & 10% Cashback',
+      code: 'CODE',
+      type: PromoType.percent,
+      value: 10,
+      minSpend: 250,
+      validUntil: DateTime(2024, 12, 28),
+    ),
+    Promo(
+      id: 'p2',
+      title: 'Best Deal: 20% OFF',
+      code: '20DEALS',
+      type: PromoType.percent,
+      value: 20,
+      minSpend: 150,
+      validUntil: DateTime(2024, 12, 31),
+    ),
+    Promo(
+      id: 'p3',
+      title: '15% OFF: New User Promotion',
+      code: 'CODE',
+      type: PromoType.percent,
+      value: 15,
+      minSpend: 120,
+      validUntil: DateTime(2024, 12, 25),
+    ),
+    Promo(
+      id: 'p4',
+      title: '8% OFF & 8% Cashback',
+      code: 'CODE',
+      type: PromoType.percent,
+      value: 8,
+      minSpend: 400,
+      validUntil: DateTime(2024, 12, 30),
+    ),
+    Promo(
+      id: 'p5',
+      title: '12% Cashback',
+      code: 'CODE',
+      type: PromoType.cashback,
+      value: 12,
+      minSpend: 1000,
+      validUntil: DateTime(2024, 12, 31),
     ),
   ];
 }
