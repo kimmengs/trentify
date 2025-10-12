@@ -110,7 +110,7 @@ class _EditCartItemSheetState extends State<EditCartItemSheet> {
         bottom: false,
         child: Container(
           decoration: BoxDecoration(
-            color: isDark ? Colors.black : Colors.white,
+            color: isDark ? Colors. black : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),

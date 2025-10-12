@@ -10,21 +10,40 @@ import 'package:trentify/screens/wish_list/wish_list.dart';
 
 class HomeShellCupertino extends StatefulWidget {
   const HomeShellCupertino({super.key});
+
+  static void navigateTo(BuildContext context, int index) {
+    final state = context.findAncestorStateOfType<_HomeShellCupertinoState>();
+    state?.setIndex(index);
+  }
+
   @override
   State<HomeShellCupertino> createState() => _HomeShellCupertinoState();
 }
 
 class _HomeShellCupertinoState extends State<HomeShellCupertino> {
   int _index = 0;
+  bool _appliedExtraOnce = false; // <- important
+
   final _visited = <bool>[true, false, false, false, false];
   final _pages = <Widget?>[null, null, null, null, null];
+
+  void setIndex(int i) => setState(() => _index = i);
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final state = GoRouterState.of(context);
-    final extra = state.extra;
+
+    // Read tabIndex from GoRouter extra ONLY when it exists
+    // and only apply it once per entry into the shell.
+    final routerState = GoRouterState.of(context);
+    final extra = routerState.extra;
     if (extra is Map && extra['tabIndex'] is int) {
-      _index = extra['tabIndex'] as int;
+      final idx = extra['tabIndex'] as int;
+      if (idx != _index) _index = idx;
+      _appliedExtraOnce = true;
+    } else if (!_appliedExtraOnce) {
+      // first time without extra: do nothing (keep default 0)
+      _appliedExtraOnce = true;
     }
   }
 
@@ -47,12 +66,11 @@ class _HomeShellCupertinoState extends State<HomeShellCupertino> {
 
   @override
   Widget build(BuildContext context) {
-    // mark current tab as visited
     _visited[_index] = true;
 
     final children = List<Widget>.generate(_visited.length, (i) {
-      if (!_visited[i]) return const SizedBox.shrink(); // not built yet
-      return _pages[i] ??= _buildPage(i); // build once, keep
+      if (!_visited[i]) return const SizedBox.shrink();
+      return _pages[i] ??= _buildPage(i);
     });
 
     return Scaffold(
@@ -68,7 +86,7 @@ class _HomeShellCupertinoState extends State<HomeShellCupertino> {
           ModernBottomBarItem(CupertinoIcons.person, 'Account'),
         ],
         currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
+        onTap: setIndex,
       ),
     );
   }
