@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -137,7 +136,7 @@ class ReviewSummaryMaterial extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Review Summary')),
       body: SafeArea(child: content),
-      backgroundColor: Color(0xFF528F65),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }
 }

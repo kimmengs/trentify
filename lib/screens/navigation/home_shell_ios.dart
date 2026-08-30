@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trentify/screens/add_to_cart/add_to_cart.dart';
 import 'package:trentify/screens/home/home.dart';
-import 'package:trentify/screens/more/%20more_page.dart';
+import 'package:trentify/screens/more/more_page.dart';
 import 'package:trentify/screens/my_order/my_order.dart';
 import 'package:trentify/screens/navigation/modern_nav.dart';
 import 'package:trentify/screens/wish_list/wish_list.dart';
+
+import 'package:trentify/l10n/app_localizations.dart';
+import 'package:trentify/provider/cart_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeShellCupertino extends StatefulWidget {
   const HomeShellCupertino({super.key});
@@ -67,6 +71,7 @@ class _HomeShellCupertinoState extends State<HomeShellCupertino> {
   @override
   Widget build(BuildContext context) {
     _visited[_index] = true;
+    final cart = context.watch<CartProvider>();
 
     final children = List<Widget>.generate(_visited.length, (i) {
       if (!_visited[i]) return const SizedBox.shrink();
@@ -78,12 +83,16 @@ class _HomeShellCupertinoState extends State<HomeShellCupertino> {
       backgroundColor: Colors.transparent,
       body: IndexedStack(index: _index, children: children),
       bottomNavigationBar: ModernBottomBar(
-        items: const [
-          ModernBottomBarItem(CupertinoIcons.house, 'Home'),
-          ModernBottomBarItem(CupertinoIcons.heart_circle, 'Wishlist'),
-          ModernBottomBarItem(CupertinoIcons.cart_fill, 'Cart'),
-          ModernBottomBarItem(CupertinoIcons.doc_text_fill, 'My Order'),
-          ModernBottomBarItem(CupertinoIcons.person, 'Account'),
+        items: [
+          ModernBottomBarItem(CupertinoIcons.house, context.tr('nav_home')),
+          ModernBottomBarItem(CupertinoIcons.heart_circle, context.tr('nav_wishlist')),
+          ModernBottomBarItem(
+            CupertinoIcons.cart_fill,
+            context.tr('nav_cart'),
+            badge: cart.totalCount > 0 ? '${cart.totalCount}' : null,
+          ),
+          ModernBottomBarItem(CupertinoIcons.doc_text_fill, context.tr('nav_orders')),
+          ModernBottomBarItem(CupertinoIcons.person, context.tr('nav_account')),
         ],
         currentIndex: _index,
         onTap: setIndex,

@@ -41,7 +41,7 @@ Future<FilterResult?> showPlatformFilterSheet(
 /// --------------------
 class FilterSheet extends StatefulWidget {
   final FilterResult initial;
-  const FilterSheet({required this.initial});
+  const FilterSheet({super.key, required this.initial});
 
   @override
   State<FilterSheet> createState() => _FilterSheetState();
@@ -119,7 +119,7 @@ class _FilterSheetState extends State<FilterSheet> {
     state = widget.initial;
   }
 
-  Color get brand => const Color(0xFF528F65);
+  Color get brand => Theme.of(context).primaryColor;
   bool get isDark =>
       MediaQuery.of(context).platformBrightness == Brightness.dark;
 
@@ -321,7 +321,7 @@ class _FilterSheetState extends State<FilterSheet> {
                         onPressed: () {
                           Navigator.pop(context, state);
                         },
-                        color: const Color(0xFF528F65),
+                        color: brand,
                         expanded: true,
                         height: 48,
                       ),
@@ -354,7 +354,7 @@ class _FilterSheetState extends State<FilterSheet> {
 class _SectionTitle extends StatelessWidget {
   final String text;
   final Widget? trailing;
-  const _SectionTitle(this.text, {this.trailing});
+  const _SectionTitle(this.text) : trailing = null;
 
   @override
   Widget build(BuildContext context) {
@@ -371,51 +371,8 @@ class _SectionTitle extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        if (trailing != null) trailing!,
+        ?trailing,
       ],
-    );
-  }
-}
-
-class _PillButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-  final Color bg, fg;
-  const _PillButton({
-    required this.label,
-    required this.onTap,
-    required this.bg,
-    required this.fg,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: onTap,
-      child: Container(
-        height: 52,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x22000000),
-              blurRadius: 10,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: fg,
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -477,7 +434,7 @@ class _WrapChips<T> extends StatelessWidget {
                   style: TextStyle(
                     color: selected
                         ? Colors.white
-                        : textPrimary.withOpacity(0.92),
+                        : textPrimary.withValues(alpha: 0.92),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -505,8 +462,6 @@ class _PriceSlider extends StatelessWidget {
     required this.brand,
     required this.onChanged,
   });
-
-  String _fmt(double v) => "\$${v.round()}";
 
   @override
   Widget build(BuildContext context) {

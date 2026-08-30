@@ -8,7 +8,7 @@ bool get _isCupertino =>
     defaultTargetPlatform == TargetPlatform.macOS;
 
 class DividerInsetWidget extends StatelessWidget {
-  const DividerInsetWidget();
+  const DividerInsetWidget({super.key});
   @override
   Widget build(BuildContext context) {
     final isIos = _isCupertino;

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class DarkCircleWidget extends StatelessWidget {
   final Widget child;
-  const DarkCircleWidget({required this.child});
+  const DarkCircleWidget({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

@@ -6,6 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trentify/l10n/app_localizations.dart';
+import 'package:trentify/l10n/locale_controller.dart';
+import 'package:trentify/provider/cart_provider.dart';
 import 'package:trentify/provider/product_provider.dart';
 
 import 'router/app_router.dart';
@@ -26,7 +29,6 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final seen = prefs.getBool('seenOnboarding') ?? false;
 
-  // You can still set a default status bar style; we’ll rely on theme brightness for most pages.
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarBrightness: Brightness.light,
@@ -34,16 +36,18 @@ Future<void> main() async {
     ),
   );
 
-  // Provide ThemeController so the whole app can react to theme changes.
   runApp(
     MultiProvider(
       providers: [
-        // your existing one
         ChangeNotifierProvider<ThemeController>(
           create: (_) => ThemeController(prefs),
         ),
-
-        // add more here
+        ChangeNotifierProvider<LocaleController>(
+          create: (_) => LocaleController(prefs),
+        ),
+        ChangeNotifierProvider<CartProvider>(
+          create: (_) => CartProvider.instance,
+        ),
         Provider<ProductRepository>(create: (_) => InMemoryProductRepository()),
       ],
       child: App(showOnboarding: !seen),
@@ -61,11 +65,18 @@ class App extends StatelessWidget {
       initialLocation: showOnboarding ? AppRoutes.onboarding : AppRoutes.signIn,
     );
 
-    // Watch theme state
+    // Watch theme and locale state
     final theme = context.watch<ThemeController>();
+    final localeCtl = context.watch<LocaleController>();
+
+    final localizationsDelegates = [
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ];
 
     if (isCupertino) {
-      // Map ThemeController.mode -> a target brightness for Cupertino
       final systemBrightness =
           WidgetsBinding.instance.platformDispatcher.platformBrightness;
       final targetBrightness = switch (theme.mode) {
@@ -77,31 +88,24 @@ class App extends StatelessWidget {
       return CupertinoApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: router,
-
-        // ✅ Localizations so RawChip / ChoiceChip etc. won’t crash
-        supportedLocales: const [Locale('en')], // add more if you support them
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-
-        // Your existing theme
+        locale: localeCtl.locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: localizationsDelegates,
         theme: buildCupertinoTheme(
           brightness: targetBrightness,
           primary: theme.seed,
         ),
-
-        // ✅ Wrap every page with a Material Theme so Material widgets have proper theming
         builder: (context, child) {
           final materialTheme = buildMaterialTheme(
             brightness: targetBrightness,
             seed: theme.seed,
             packId: theme.packId,
           );
-          return Theme(
-            data: materialTheme,
-            child: child ?? const SizedBox.shrink(),
+          return ScaffoldMessenger(
+            child: Theme(
+              data: materialTheme,
+              child: child ?? const SizedBox.shrink(),
+            ),
           );
         },
       );
@@ -111,13 +115,15 @@ class App extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      themeMode: theme.materialMode, // system / light / dark from controller
+      locale: localeCtl.locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: localizationsDelegates,
+      themeMode: theme.materialMode,
       theme: buildMaterialTheme(
         brightness: Brightness.light,
         seed: theme.seed,
         packId: theme.packId,
       ),
-
       darkTheme: buildMaterialTheme(
         brightness: Brightness.dark,
         seed: theme.seed,

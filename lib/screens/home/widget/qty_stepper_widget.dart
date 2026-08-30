@@ -5,7 +5,7 @@ class QtyStepperWidget extends StatelessWidget {
   final int value;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
-  const QtyStepperWidget({
+  const QtyStepperWidget({super.key, 
     required this.value,
     required this.onIncrement,
     required this.onDecrement,

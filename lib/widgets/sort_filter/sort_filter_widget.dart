@@ -20,9 +20,9 @@ Widget buildSortFilterBar({
           height: 54,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: isDark ? Colors.black87 : Colors.white.withOpacity(0.7),
+            color: isDark ? Colors.black87 : Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withOpacity(0.4)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x22000000),

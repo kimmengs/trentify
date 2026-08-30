@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
+import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/order_product.dart';
 import 'package:trentify/model/order_status.dart';
 import 'package:trentify/model/order_summary.dart';
@@ -18,64 +19,72 @@ class MyOrderPage extends StatefulWidget {
 class _MyOrderPageState extends State<MyOrderPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
-  late final List<OrderSummary> _orders;
+  late List<OrderSummary> _orders;
+  final TextEditingController _searchCtl = TextEditingController();
+  String _searchQuery = '';
+  bool _isSearchVisible = false;
 
   @override
   void initState() {
     super.initState();
     _tab = TabController(length: 3, vsync: this);
 
-    // mock orders
     _orders = [
       OrderSummary(
-        id: 'A-1001',
+        id: 'ORD-1001',
         createdAt: DateTime.now(),
         products: const [
           OrderProduct(
-            'Urban Blend Long Sleeve Shirt',
+            'Urban Blend Long Sleeve Silk Shirt',
             'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop',
           ),
-          OrderProduct('Slim Jeans', 'https://picsum.photos/seed/jean/400/600'),
           OrderProduct(
-            'Canvas Belt',
-            'https://picsum.photos/seed/belt/400/600',
+            'Tailored Slim Fit Denim Jeans',
+            'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop',
+          ),
+          OrderProduct(
+            'Italian Leather Luxury Belt',
+            'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop',
           ),
         ],
         total: 441.50,
         status: OrderStatus.active,
       ),
       OrderSummary(
-        id: 'A-1000',
+        id: 'ORD-1000',
         createdAt: DateTime.now().subtract(const Duration(days: 1)),
         products: const [
           OrderProduct(
-            'Urban Elegance Business Jacket',
-            'https://picsum.photos/seed/jacket/400/600',
+            'Urban Elegance Wool Business Blazer',
+            'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop',
           ),
         ],
         total: 184.50,
         status: OrderStatus.active,
       ),
       OrderSummary(
-        id: 'A-0999',
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        id: 'ORD-0999',
+        createdAt: DateTime.now().subtract(const Duration(days: 3)),
         products: const [
           OrderProduct(
-            'Classic Hoodie',
-            'https://picsum.photos/seed/hoodie/400/600',
+            'Oversized Heavyweight Cotton Hoodie',
+            'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=800&auto=format&fit=crop',
           ),
-          OrderProduct('Basic Tee', 'https://picsum.photos/seed/tee/400/600'),
+          OrderProduct(
+            'Minimalist Premium Crewneck Tee',
+            'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop',
+          ),
         ],
         total: 120.00,
         status: OrderStatus.completed,
       ),
       OrderSummary(
-        id: 'A-0998',
-        createdAt: DateTime.now().subtract(const Duration(days: 4)),
+        id: 'ORD-0998',
+        createdAt: DateTime.now().subtract(const Duration(days: 7)),
         products: const [
           OrderProduct(
-            'Modal Knit',
-            'https://picsum.photos/seed/modal/400/600',
+            'Modal Silk Fine Knit Sweater',
+            'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=800&auto=format&fit=crop',
           ),
         ],
         total: 90.00,
@@ -84,7 +93,15 @@ class _MyOrderPageState extends State<MyOrderPage>
     ];
   }
 
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    _tab.dispose();
+    super.dispose();
+  }
+
   Future<void> _requestCancel(OrderSummary order) async {
+    HapticFeedback.lightImpact();
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -95,84 +112,174 @@ class _MyOrderPageState extends State<MyOrderPage>
       ),
     );
 
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const CancelSuccessSheet(),
-    );
+    if (confirmed == true && mounted) {
+      setState(() {
+        final index = _orders.indexWhere((o) => o.id == order.id);
+        if (index != -1) {
+          _orders[index] = OrderSummary(
+            id: order.id,
+            createdAt: order.createdAt,
+            products: order.products,
+            total: order.total,
+            status: OrderStatus.canceled,
+          );
+        }
+      });
+
+      await showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (_) => const CancelSuccessSheet(),
+      );
+    }
   }
 
-  @override
-  void dispose() {
-    _tab.dispose();
-    super.dispose();
+  List<OrderSummary> _filterOrders(OrderStatus status) {
+    return _orders.where((o) {
+      final matchesStatus = o.status == status;
+      if (!matchesStatus) return false;
+      if (_searchQuery.trim().isEmpty) return true;
+      final q = _searchQuery.toLowerCase();
+      final matchesId = o.id.toLowerCase().contains(q);
+      final matchesProduct = o.products.any((p) => p.title.toLowerCase().contains(q));
+      return matchesId || matchesProduct;
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
+    final cardBg = isDark ? const Color(0xFF161B22) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
 
-    final activeCount = _orders
-        .where((o) => o.status == OrderStatus.active)
-        .length;
-    final completedCount = _orders
-        .where((o) => o.status == OrderStatus.completed)
-        .length;
-    final canceledCount = _orders
-        .where((o) => o.status == OrderStatus.canceled)
-        .length;
+    final activeCount = _orders.where((o) => o.status == OrderStatus.active).length;
+    final completedCount = _orders.where((o) => o.status == OrderStatus.completed).length;
+    final canceledCount = _orders.where((o) => o.status == OrderStatus.canceled).length;
 
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF090D14) : const Color(0xFFF8FAFC),
       appBar: AppBar(
+        backgroundColor: isDark ? const Color(0xFF090D14) : const Color(0xFFF8FAFC),
+        elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
-        title: const Text('My Order'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.maybePop(context),
+        title: Text(
+          context.tr('my_orders'),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: textPrimary,
+          ),
         ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: Icon(CupertinoIcons.back, color: textPrimary),
+                onPressed: () => Navigator.maybePop(context),
+              )
+            : null,
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+          IconButton(
+            icon: Icon(
+              _isSearchVisible ? CupertinoIcons.xmark_circle_fill : CupertinoIcons.search,
+              color: textPrimary,
+              size: 22,
+            ),
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              setState(() {
+                _isSearchVisible = !_isSearchVisible;
+                if (!_isSearchVisible) {
+                  _searchCtl.clear();
+                  _searchQuery = '';
+                }
+              });
+            },
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
         children: [
-          const SizedBox(height: 6),
+          // Collapsible Search Bar
+          if (_isSearchVisible)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: borderColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _searchCtl,
+                  autofocus: true,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: context.tr('order_search_placeholder'),
+                    hintStyle: TextStyle(fontSize: 13, color: textSecondary),
+                    prefixIcon: Icon(CupertinoIcons.search, size: 18, color: textSecondary),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(CupertinoIcons.clear_thick_circled, size: 16),
+                            onPressed: () {
+                              _searchCtl.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  ),
+                  onChanged: (val) => setState(() => _searchQuery = val),
+                ),
+              ),
+            ),
 
-          // Segments (tab bar styled like pills)
+          // Sliding Segmented Tab Pill Selector
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
             child: SegmentedTabsWidget(
               controller: _tab,
               items: [
-                'Active ($activeCount)',
-                'Completed ($completedCount)',
-                'Canceled ($canceledCount)',
+                '${context.tr('order_active')} ($activeCount)',
+                '${context.tr('order_completed')} ($completedCount)',
+                '${context.tr('order_canceled')} ($canceledCount)',
               ],
             ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
 
-          // Lists
+          // Tab Views
           Expanded(
             child: TabBarView(
               controller: _tab,
+              physics: const BouncingScrollPhysics(),
               children: [
                 OrderListWidget(
-                  orders: _orders.where((o) => o.status == OrderStatus.active),
+                  orders: _filterOrders(OrderStatus.active),
                   onRequestCancel: _requestCancel,
                 ),
                 OrderListWidget(
-                  orders: _orders.where(
-                    (o) => o.status == OrderStatus.completed,
-                  ),
+                  orders: _filterOrders(OrderStatus.completed),
                   onRequestCancel: _requestCancel,
                 ),
                 OrderListWidget(
-                  orders: _orders.where(
-                    (o) => o.status == OrderStatus.canceled,
-                  ),
+                  orders: _filterOrders(OrderStatus.canceled),
                   onRequestCancel: _requestCancel,
                 ),
               ],
@@ -180,7 +287,6 @@ class _MyOrderPageState extends State<MyOrderPage>
           ),
         ],
       ),
-      backgroundColor: cs.surface,
     );
   }
 }

@@ -1,7 +1,10 @@
-// lib/screens/auth/sign_up/sign_up_ios.dart
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:trentify/widgets/input_widget.dart';
+import 'package:trentify/l10n/app_localizations.dart';
+import 'package:trentify/router/app_routes.dart';
+import 'package:trentify/widgets/pressable_scale.dart';
 
 class SignUpPageCupertino extends StatefulWidget {
   const SignUpPageCupertino({super.key});
@@ -11,199 +14,303 @@ class SignUpPageCupertino extends StatefulWidget {
 }
 
 class _SignUpPageCupertinoState extends State<SignUpPageCupertino> {
+  final _nameCtl = TextEditingController();
   final _emailCtl = TextEditingController();
   final _pwdCtl = TextEditingController();
+  final _nameNode = FocusNode();
+  final _emailNode = FocusNode();
+  final _pwdNode = FocusNode();
+
   bool _obscure = true;
   bool _submitting = false;
 
   @override
   void dispose() {
+    _nameCtl.dispose();
     _emailCtl.dispose();
     _pwdCtl.dispose();
+    _nameNode.dispose();
+    _emailNode.dispose();
+    _pwdNode.dispose();
     super.dispose();
   }
 
-  String? _validateEmail(String? v) {
-    final value = (v ?? '').trim();
-    if (value.isEmpty) return 'Email is required';
-    final emailRe = RegExp(r'^[\w\.\-+]+@[\w\.\-]+\.[A-Za-z]{2,}$');
-    if (!emailRe.hasMatch(value)) return 'Enter a valid email';
-    return null;
-  }
-
-  String? _validatePassword(String? v) {
-    final value = (v ?? '');
-    if (value.isEmpty) return 'Password is required';
-    if (value.length < 6) return 'Minimum 6 characters';
-    return null;
-  }
-
   Future<void> _submit() async {
+    HapticFeedback.mediumImpact();
     FocusManager.instance.primaryFocus?.unfocus();
-    final emailErr = _validateEmail(_emailCtl.text);
-    final pwdErr = _validatePassword(_pwdCtl.text);
-
-    if (emailErr != null || pwdErr != null) {
-      await showCupertinoDialog(
-        context: context,
-        builder: (_) => CupertinoAlertDialog(
-          title: const Text('Check your details'),
-          content: Text([emailErr, pwdErr].whereType<String>().join('\n')),
-          actions: [
-            CupertinoDialogAction(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
 
     setState(() => _submitting = true);
-    await Future.delayed(const Duration(milliseconds: 900));
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
     setState(() => _submitting = false);
 
-    // Navigate or show success
-    await showCupertinoDialog(
-      context: context,
-      builder: (_) => CupertinoAlertDialog(
-        title: const Text('Account created'),
-        content: Text('Welcome, ${_emailCtl.text.trim()}!'),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Nice'),
-          ),
-        ],
-      ),
-    );
-    if (!mounted) return;
-    context.go('/signin');
+    context.go(AppRoutes.home);
   }
 
   @override
   Widget build(BuildContext context) {
-    final safe = MediaQuery.of(context).padding;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.primaryColor;
 
-    return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.systemGroupedBackground,
-      navigationBar: const CupertinoNavigationBar(
-        automaticallyImplyLeading: true,
-        border: null,
-        backgroundColor: CupertinoColors.systemGroupedBackground,
-        middle: Text('Sign up'),
+    final cardBg = isDark ? const Color(0xFF161B22) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
+    final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
+
+    return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0D1117) : const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(CupertinoIcons.back),
+          onPressed: () => context.go(AppRoutes.signIn),
+        ),
+        title: const Text('Create Account'),
       ),
-      child: SafeArea(
-        bottom: false,
+      body: SafeArea(
         child: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: EdgeInsets.fromLTRB(20, 12, 20, 16 + safe.bottom),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 24),
-              Center(
-                child: Container(
-                  width: 96,
-                  height: 96,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF528F65), CupertinoColors.systemBlue],
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    CupertinoIcons.circle_grid_3x3_fill,
-                    color: CupertinoColors.white,
-                    size: 40,
-                  ),
+              const SizedBox(height: 8),
+              Text(
+                context.tr('create_account'),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                context.tr('join_trentify'),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: textSecondary),
               ),
               const SizedBox(height: 28),
-              const Text(
-                'Create New Account',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+
+              // Form Card
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: borderColor, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Full Name
+                    Text(
+                      context.tr('full_name'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _nameCtl,
+                      focusNode: _nameNode,
+                      textInputAction: TextInputAction.next,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Alex Morgan',
+                        hintStyle: TextStyle(color: textSecondary, fontSize: 14),
+                        prefixIcon: Icon(
+                          CupertinoIcons.person,
+                          size: 20,
+                          color: textSecondary,
+                        ),
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0D1117) : const Color(0xFFF1F5F9),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: borderColor, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: primaryColor, width: 1.5),
+                        ),
+                      ),
+                      onSubmitted: (_) => _emailNode.requestFocus(),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Email Address
+                    Text(
+                      context.tr('email_address'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _emailCtl,
+                      focusNode: _emailNode,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                      decoration: InputDecoration(
+                        hintText: context.tr('email_hint'),
+                        hintStyle: TextStyle(color: textSecondary, fontSize: 14),
+                        prefixIcon: Icon(
+                          CupertinoIcons.mail,
+                          size: 20,
+                          color: textSecondary,
+                        ),
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0D1117) : const Color(0xFFF1F5F9),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: borderColor, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: primaryColor, width: 1.5),
+                        ),
+                      ),
+                      onSubmitted: (_) => _pwdNode.requestFocus(),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Password
+                    Text(
+                      context.tr('password'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _pwdCtl,
+                      focusNode: _pwdNode,
+                      obscureText: _obscure,
+                      textInputAction: TextInputAction.done,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                      decoration: InputDecoration(
+                        hintText: '••••••••',
+                        hintStyle: TextStyle(color: textSecondary, fontSize: 14),
+                        prefixIcon: Icon(
+                          CupertinoIcons.lock,
+                          size: 20,
+                          color: textSecondary,
+                        ),
+                        suffixIcon: IconButton(
+                          onPressed: () => setState(() => _obscure = !_obscure),
+                          icon: Icon(
+                            _obscure ? CupertinoIcons.eye_slash : CupertinoIcons.eye,
+                            size: 18,
+                            color: textSecondary,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0D1117) : const Color(0xFFF1F5F9),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: borderColor, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: primaryColor, width: 1.5),
+                        ),
+                      ),
+                      onSubmitted: (_) => _submit(),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Sign Up CTA Button
+                    PressableScale(
+                      onTap: _submitting ? null : _submit,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primaryColor.withValues(alpha: 0.35),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: _submitting
+                              ? const CupertinoActivityIndicator(color: Colors.white)
+                              : Text(
+                                  context.tr('sign_up'),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
 
-              InputWidget(
-                controller: _emailCtl,
-                placeholder: 'Email',
-                keyboardType: TextInputType.emailAddress,
-                prefix: const Icon(
-                  CupertinoIcons.envelope_fill,
-                  size: 18,
-                  color: CupertinoColors.systemGrey,
-                ),
-                validator: _validateEmail,
-                textInputAction: TextInputAction.next,
-                onSubmitted: (_) => FocusScope.of(context).nextFocus(),
-              ),
-              const SizedBox(height: 14),
-              InputWidget(
-                controller: _pwdCtl,
-                placeholder: 'Password',
-                obscureText: _obscure,
-                prefix: const Icon(
-                  CupertinoIcons.lock_fill,
-                  size: 18,
-                  color: CupertinoColors.systemGrey,
-                ),
-                suffix: CupertinoButton(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: const Size(0, 0),
-                  onPressed: () => setState(() => _obscure = !_obscure),
-                  child: Icon(
-                    _obscure
-                        ? CupertinoIcons.eye_slash_fill
-                        : CupertinoIcons.eye_fill,
-                    size: 20,
-                    color: CupertinoColors.systemGrey2,
-                  ),
-                ),
-                validator: _validatePassword,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _submit(),
-              ),
-
-              const SizedBox(height: 18),
-              CupertinoButton.filled(
-                borderRadius: BorderRadius.circular(16),
-                onPressed: _submitting ? null : _submit,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: _submitting
-                    ? const CupertinoActivityIndicator()
-                    : const Text(
-                        'Sign up',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              ),
-
-              const SizedBox(height: 22),
-              // You can reuse your DividerTextWidget / SocialCircleWidget here if desired.
+              // Sign in Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Already have an account? ',
-                    style: TextStyle(color: CupertinoColors.inactiveGray),
+                  Text(
+                    '${context.tr('have_account')} ',
+                    style: TextStyle(fontSize: 14, color: textSecondary),
                   ),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => context.go('/signin'),
-                    child: const Text(
-                      'Sign in',
+                  GestureDetector(
+                    onTap: () => context.go(AppRoutes.signIn),
+                    child: Text(
+                      context.tr('sign_in'),
                       style: TextStyle(
-                        color: Color(0xFF528F65),
-                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: primaryColor,
                       ),
                     ),
                   ),

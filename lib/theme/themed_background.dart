@@ -78,7 +78,7 @@ class ThemedBackground extends StatelessWidget {
           ),
         ),
 
-        if (child != null) child!,
+        ?child,
       ],
     );
   }

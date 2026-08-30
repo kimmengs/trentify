@@ -1,5 +1,3 @@
-import 'dart:ui';
-import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:trentify/model/demodb.dart';

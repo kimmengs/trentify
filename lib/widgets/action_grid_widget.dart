@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class ActionsGridWidget extends StatelessWidget {
-  const ActionsGridWidget({required this.actions});
+  const ActionsGridWidget({super.key, required this.actions});
   final List<Widget> actions;
 
   @override

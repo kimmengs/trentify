@@ -4,7 +4,7 @@ class TabsBarWidget extends StatelessWidget {
   final List<String> tabs;
   final int value;
   final ValueChanged<int> onChanged;
-  const TabsBarWidget({
+  const TabsBarWidget({super.key, 
     required this.tabs,
     required this.value,
     required this.onChanged,

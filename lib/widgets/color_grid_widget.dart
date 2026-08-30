@@ -8,7 +8,7 @@ class ColorGridWidget extends StatelessWidget {
   final Color textPrimary;
   final Color border;
 
-  const ColorGridWidget({
+  const ColorGridWidget({super.key, 
     required this.colors,
     required this.selectedName,
     required this.onPick,
@@ -59,7 +59,7 @@ class ColorGridWidget extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: textPrimary.withOpacity(0.9),
+                        color: textPrimary.withValues(alpha: 0.9),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),

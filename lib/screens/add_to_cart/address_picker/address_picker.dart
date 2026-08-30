@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trentify/model/address.dart';
@@ -63,7 +62,7 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
         itemCount: _list.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 14),
+        separatorBuilder: (_, _) => const SizedBox(height: 14),
         itemBuilder: (_, i) {
           final a = _list[i];
           final selected = a.id == _selectedId;
@@ -82,7 +81,7 @@ class _AddressPickerPageState extends State<AddressPickerPage> {
             height: 52,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF528F65),
+                backgroundColor: Theme.of(context).primaryColor,
                 shape: const StadiumBorder(),
               ),
               onPressed: _selectedId == null
@@ -116,10 +115,12 @@ class _AddressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final cs = theme.colorScheme;
+    final text = theme.textTheme;
 
-    final borderColor = selected ? const Color(0xFF528F65) : Colors.transparent;
+    final borderColor = selected ? primaryColor : Colors.transparent;
     final surface = cs.surfaceContainerHighest;
 
     return Material(
@@ -140,23 +141,23 @@ class _AddressCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // top row: label + chip + share icon
-              // inside _AddressCard top row actions
-              IconButton(
-                tooltip: 'Edit',
-                icon: const Icon(Icons.edit_outlined, size: 20),
-                onPressed: () async {
-                  final updated = await context.push<Address>(
-                    AppRoutes.addressForm,
-                    extra: address,
-                  );
-                  if (updated != null) {
-                    // bubble a callback up or handle via state mgmt
-                  }
-                },
-              ),
+              // label + tag + share
               Row(
                 children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.location_on,
+                      size: 18,
+                      color: primaryColor,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
                   Text(
                     address.label,
                     style: text.titleMedium?.copyWith(
@@ -171,14 +172,14 @@ class _AddressCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0x1A528F65),
+                        color: primaryColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFF528F65)),
+                        border: Border.all(color: primaryColor),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Main Address',
                         style: TextStyle(
-                          color: Color(0xFF528F65),
+                          color: primaryColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
@@ -186,13 +187,26 @@ class _AddressCard extends StatelessWidget {
                     ),
                   const Spacer(),
                   IconButton(
+                    tooltip: 'Edit',
+                    icon: const Icon(Icons.edit_outlined, size: 20),
+                    onPressed: () async {
+                      final updated = await context.push<Address>(
+                        AppRoutes.addressForm,
+                        extra: address,
+                      );
+                      if (updated != null) {
+                        // bubble a callback up or handle via state mgmt
+                      }
+                    },
+                  ),
+                  IconButton(
                     tooltip: 'Share',
                     onPressed: () {}, // TODO: share address
                     icon: const Icon(Icons.share_outlined, size: 20),
                   ),
                 ],
               ),
-              Divider(color: cs.outlineVariant.withOpacity(.35)),
+              Divider(color: cs.outlineVariant.withValues(alpha: .35)),
               const SizedBox(height: 6),
 
               // name + phone
@@ -235,7 +249,7 @@ class _AddressCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   if (selected)
-                    const Icon(Icons.check, color: Color(0xFF528F65)),
+                    Icon(Icons.check, color: primaryColor),
                 ],
               ),
             ],

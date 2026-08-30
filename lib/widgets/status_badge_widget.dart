@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class StatusBadgeWidget extends StatelessWidget {
-  const StatusBadgeWidget({required this.text, required this.color});
+  const StatusBadgeWidget({super.key, required this.text, required this.color});
   final String text;
   final Color color;
 

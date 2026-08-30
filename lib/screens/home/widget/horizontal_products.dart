@@ -4,7 +4,7 @@ import 'package:trentify/screens/home/widget/product_card_widget.dart';
 
 class HorizontalProducts extends StatelessWidget {
   final List<Product> products;
-  const HorizontalProducts({required this.products});
+  const HorizontalProducts({super.key, required this.products});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class HorizontalProducts extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: products.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, index) =>
             ProductCardWidget(product: products[index]),
       ),

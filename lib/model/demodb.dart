@@ -1,12 +1,16 @@
-import 'dart:ui';
-
 import 'package:trentify/model/address.dart';
 import 'package:trentify/model/payment_method.dart';
 import 'package:trentify/model/product.dart';
 import 'package:trentify/model/promo.dart';
-import 'package:trentify/screens/home/home_ios.dart';
 import 'package:trentify/screens/home/product_detail.dart';
 import 'package:flutter/material.dart';
+
+class CategoryItem {
+  final String title;
+  final String imagePath;
+  final IconData? icon;
+  const CategoryItem(this.title, this.imagePath, {this.icon});
+}
 
 class RawVoucher {
   final String label, code, details;
@@ -364,32 +368,32 @@ class DemoDb {
   ];
 
   static const demoMethods = <PaymentMethod>[
-    const PaymentMethod(id: 'paypal', kind: PaymentKind.wallet, name: 'PayPal'),
-    const PaymentMethod(
+    PaymentMethod(id: 'paypal', kind: PaymentKind.wallet, name: 'PayPal'),
+    PaymentMethod(
       id: 'gpay',
       kind: PaymentKind.wallet,
       name: 'Google Pay',
     ),
-    const PaymentMethod(
+    PaymentMethod(
       id: 'apple',
       kind: PaymentKind.wallet,
       name: 'Apple Pay',
     ),
-    const PaymentMethod(
+    PaymentMethod(
       id: 'mc4679',
       kind: PaymentKind.card,
       name: 'Mastercard',
       brand: 'Mastercard',
       last4: '4679',
     ),
-    const PaymentMethod(
+    PaymentMethod(
       id: 'visa5567',
       kind: PaymentKind.card,
       name: 'Visa',
       brand: 'Visa',
       last4: '5567',
     ),
-    const PaymentMethod(
+    PaymentMethod(
       id: 'amex8456',
       kind: PaymentKind.card,
       name: 'American Express',

@@ -4,7 +4,7 @@ class ExpandableTextWidget extends StatelessWidget {
   final String text;
   final bool expanded;
   final VoidCallback onToggle;
-  const ExpandableTextWidget({
+  const ExpandableTextWidget({super.key, 
     required this.text,
     required this.expanded,
     required this.onToggle,

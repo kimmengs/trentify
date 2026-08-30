@@ -1,15 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 
-Widget BuildProductImageWidget(String pathOrUrl) {
+Widget buildProductImageWidget(String pathOrUrl) {
   final isNetwork = pathOrUrl.startsWith('http');
   if (isNetwork) {
     return CachedNetworkImage(
       imageUrl: pathOrUrl,
       fit: BoxFit.cover,
       alignment: Alignment.topCenter,
-      placeholder: (_, __) => const _ImagePlaceholder(),
-      errorWidget: (_, __, ___) => const _ImagePlaceholder(),
+      placeholder: (_, _) => const _ImagePlaceholder(),
+      errorWidget: (_, _, _) => const _ImagePlaceholder(),
     );
   } else {
     // Asset
@@ -17,7 +17,7 @@ Widget BuildProductImageWidget(String pathOrUrl) {
       pathOrUrl,
       fit: BoxFit.cover,
       alignment: Alignment.topCenter,
-      errorBuilder: (_, __, ___) => const _ImagePlaceholder(),
+      errorBuilder: (_, _, _) => const _ImagePlaceholder(),
     );
   }
 }

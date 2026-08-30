@@ -98,17 +98,18 @@ class TransactionDetailIOS extends StatelessWidget {
                             const SizedBox(width: 8),
                             CupertinoButton(
                               padding: EdgeInsets.zero,
-                              minSize: 28,
                               onPressed: () async {
                                 await Clipboard.setData(
                                   ClipboardData(text: detail.txId),
                                 );
-                                _toast(context, 'Copied');
-                              },
-                              child: const Icon(
+                                if (context.mounted) {
+                                  _toast(context, 'Copied');
+                                }
+                              }, minimumSize: const Size(28, 28),
+                              child: Icon(
                                 CupertinoIcons.doc_on_doc,
                                 size: 18,
-                                color: Color(0xFF528F65),
+                                color: Theme.of(context).primaryColor,
                               ),
                             ),
                           ],

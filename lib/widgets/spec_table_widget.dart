@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class SpecTableWidget extends StatelessWidget {
   final Map<String, String> specs;
-  const SpecTableWidget({required this.specs});
+  const SpecTableWidget({super.key, required this.specs});
 
   @override
   Widget build(BuildContext context) {

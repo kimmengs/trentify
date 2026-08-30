@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Theme;
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:trentify/model/recent_trx.dart';
@@ -12,7 +13,7 @@ class TransactionTileIOS extends StatelessWidget {
   Widget build(BuildContext context) {
     final f = NumberFormat.currency(symbol: '\$');
     final isCredit = tx.amount >= 0;
-    final color = isCredit ? const Color(0xFF2DA54E) : const Color(0xFFEC4D4D);
+    final color = isCredit ? Theme.of(context).primaryColor : const Color(0xFFEC4D4D);
 
     final content = Container(
       color: CupertinoColors.systemBackground.resolveFrom(context),

@@ -9,7 +9,7 @@ class BottomButtonPlatformWidget extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const BottomButtonPlatformWidget({
+  const BottomButtonPlatformWidget({super.key, 
     required this.isCupertino,
     required this.isDark,
     required this.cupertinoIcon,

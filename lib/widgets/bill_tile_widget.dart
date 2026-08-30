@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:trentify/model/bill_category.dart';
 
 class BillTileWidget extends StatelessWidget {
-  const BillTileWidget({required this.cat, required this.onTap});
+  const BillTileWidget({super.key, required this.cat, required this.onTap});
   final BillCategory cat;
   final VoidCallback onTap;
 

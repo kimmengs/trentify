@@ -47,7 +47,7 @@ class ThemeController extends ChangeNotifier {
 
   void setSeed(Color c) {
     _seed = c;
-    _prefs.setInt('theme_seed', c.value);
+    _prefs.setInt('theme_seed', c.toARGB32());
     notifyListeners();
   }
 

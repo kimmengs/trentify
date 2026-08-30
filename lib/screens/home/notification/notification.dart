@@ -1,7 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:trentify/widgets/section_header_widget.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:trentify/l10n/app_localizations.dart';
+import 'package:trentify/router/app_routes.dart';
+import 'package:trentify/widgets/pressable_scale.dart';
 
-enum NoticeTab { general, promotions }
+enum NoticeCategory { all, orders, promos, system }
 
 class NoticeItem {
   final String id;
@@ -9,8 +14,12 @@ class NoticeItem {
   final String body;
   final DateTime time;
   final IconData icon;
-  final bool unread;
-  final NoticeTab tab;
+  final List<Color> gradientColors;
+  final NoticeCategory category;
+  final String? actionLabel;
+  final String? targetRoute;
+  final Map<String, dynamic>? extra;
+  bool isUnread;
 
   NoticeItem({
     required this.id,
@@ -18,8 +27,12 @@ class NoticeItem {
     required this.body,
     required this.time,
     required this.icon,
-    this.unread = true,
-    this.tab = NoticeTab.general,
+    required this.gradientColors,
+    required this.category,
+    this.actionLabel,
+    this.targetRoute,
+    this.extra,
+    this.isUnread = true,
   });
 }
 
@@ -31,162 +44,330 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  NoticeTab _tab = NoticeTab.general;
+  NoticeCategory _selectedCategory = NoticeCategory.all;
 
-  // --- demo data (swap with your backend/provider) ---
-  late final List<NoticeItem> _all = [
-    NoticeItem(
-      id: '1',
-      title: 'Account Security Alert 🔒',
-      body:
-          "We've noticed some unusual activity on your account. Please review your recent logins and update your password if necessary.",
-      time: DateTime.now().subtract(const Duration(minutes: 5)),
-      icon: Icons.verified_user_outlined,
-      tab: NoticeTab.general,
-    ),
-    NoticeItem(
-      id: '2',
-      title: 'System Update Available 🔄',
-      body:
-          'A new system update is ready for installation. It includes performance improvements and bug fixes.',
-      time: DateTime.now().subtract(const Duration(minutes: 55)),
-      icon: Icons.info_outline,
-      tab: NoticeTab.general,
-    ),
-    NoticeItem(
-      id: '3',
-      title: 'Password Reset Successful ✅',
-      body:
-          "Your password has been successfully reset. If you didn't request this change, please contact support immediately.",
-      time: DateTime.now().subtract(const Duration(hours: 14)), // yesterday
-      icon: Icons.lock_outline,
-      tab: NoticeTab.general,
-      unread: false,
-    ),
-    NoticeItem(
-      id: '4',
-      title: 'Exciting New Feature 🆕',
-      body:
-          "We've just launched a new feature that will enhance your user experience. Check it out now!",
-      time: DateTime.now().subtract(const Duration(hours: 17)), // yesterday
-      icon: Icons.grade_outlined,
-      tab: NoticeTab.general,
-    ),
-    // promotions
-    NoticeItem(
-      id: 'p1',
-      title: 'Weekend Mega Sale 🎉',
-      body: 'Up to 40% OFF selected items. Limited time only.',
-      time: DateTime.now().subtract(const Duration(hours: 2)),
-      icon: Icons.local_offer_outlined,
-      tab: NoticeTab.promotions,
-    ),
-    NoticeItem(
-      id: 'p2',
-      title: 'Free Shipping Voucher ✈️',
-      body: 'Use code FREESHIP on orders above \$50.',
-      time: DateTime.now().subtract(const Duration(days: 1, hours: 3)),
-      icon: Icons.card_giftcard_outlined,
-      tab: NoticeTab.promotions,
-    ),
-  ];
+  late List<NoticeItem> _notifications;
+
+  @override
+  void initState() {
+    super.initState();
+    _initNotifications();
+  }
+
+  void _initNotifications() {
+    final now = DateTime.now();
+    _notifications = [
+      NoticeItem(
+        id: 'ord_1',
+        title: 'Package Out for Delivery ✈️',
+        body: 'Your order #ORD-1001 with DHL Express Priority is out for delivery today.',
+        time: now.subtract(const Duration(minutes: 24)),
+        icon: CupertinoIcons.airplane,
+        gradientColors: const [Color(0xFF2563EB), Color(0xFF38BDF8)],
+        category: NoticeCategory.orders,
+        actionLabel: 'Track Shipment',
+        targetRoute: AppRoutes.home,
+        extra: {'tabIndex': 3},
+        isUnread: true,
+      ),
+      NoticeItem(
+        id: 'promo_1',
+        title: 'VIP Weekend Exclusive: 20% OFF 🎉',
+        body: 'Use code LUXURY20 at checkout for 20% off all designer suits and outerwear.',
+        time: now.subtract(const Duration(hours: 2)),
+        icon: CupertinoIcons.tag_fill,
+        gradientColors: const [Color(0xFF8B5CF6), Color(0xFFD946EF)],
+        category: NoticeCategory.promos,
+        actionLabel: 'Shop Collection',
+        targetRoute: AppRoutes.home,
+        extra: {'tabIndex': 0},
+        isUnread: true,
+      ),
+      NoticeItem(
+        id: 'ord_2',
+        title: 'Order Confirmed & Prepared 📦',
+        body: 'Order #ORD-1000 has been verified by the boutique and packed for express dispatch.',
+        time: now.subtract(const Duration(hours: 6)),
+        icon: CupertinoIcons.cube_box_fill,
+        gradientColors: const [Color(0xFF10B981), Color(0xFF34D399)],
+        category: NoticeCategory.orders,
+        actionLabel: 'View Order',
+        targetRoute: AppRoutes.home,
+        extra: {'tabIndex': 3},
+        isUnread: true,
+      ),
+      NoticeItem(
+        id: 'promo_2',
+        title: 'Free VIP Express Delivery Unlocked 🚀',
+        body: 'Enjoy complimentary express courier shipping on all purchases above \$300.',
+        time: now.subtract(const Duration(days: 1, hours: 2)),
+        icon: CupertinoIcons.sparkles,
+        gradientColors: const [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+        category: NoticeCategory.promos,
+        actionLabel: 'View Bag',
+        targetRoute: AppRoutes.home,
+        extra: {'tabIndex': 2},
+        isUnread: false,
+      ),
+      NoticeItem(
+        id: 'sys_1',
+        title: 'Account Security Verified 🔒',
+        body: 'Biometric Face ID authentication was successfully registered for your VIP account.',
+        time: now.subtract(const Duration(days: 1, hours: 8)),
+        icon: CupertinoIcons.shield_lefthalf_fill,
+        gradientColors: const [Color(0xFF6366F1), Color(0xFF818CF8)],
+        category: NoticeCategory.system,
+        isUnread: false,
+      ),
+      NoticeItem(
+        id: 'sys_2',
+        title: 'New Spring/Summer Catalog Live ✨',
+        body: 'Explore over 50+ new luxury silhouettes added to Trentify Haute Couture today.',
+        time: now.subtract(const Duration(days: 2, hours: 4)),
+        icon: CupertinoIcons.app_badge_fill,
+        gradientColors: const [Color(0xFFEC4899), Color(0xFFF43F5E)],
+        category: NoticeCategory.system,
+        actionLabel: 'Explore Catalog',
+        targetRoute: AppRoutes.home,
+        extra: {'tabIndex': 0},
+        isUnread: false,
+      ),
+    ];
+  }
+
+  void _markAllAsRead() {
+    HapticFeedback.lightImpact();
+    setState(() {
+      for (final n in _notifications) {
+        n.isUnread = false;
+      }
+    });
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      const SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text('All notifications marked as read'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _handleNotificationTap(NoticeItem item) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      item.isUnread = false;
+    });
+
+    if (item.targetRoute != null) {
+      if (item.targetRoute == AppRoutes.home && item.extra != null) {
+        context.go(AppRoutes.home, extra: item.extra);
+      } else {
+        context.push(item.targetRoute!);
+      }
+    }
+  }
+
+  void _deleteNotification(NoticeItem item) {
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _notifications.removeWhere((n) => n.id == item.id);
+    });
+  }
+
+  List<NoticeItem> get _filteredNotifications {
+    if (_selectedCategory == NoticeCategory.all) return _notifications;
+    return _notifications.where((n) => n.category == _selectedCategory).toList();
+  }
+
+  int _countFor(NoticeCategory cat) {
+    if (cat == NoticeCategory.all) return _notifications.length;
+    return _notifications.where((n) => n.category == cat).length;
+  }
+
+  int get _totalUnread => _notifications.where((n) => n.isUnread).length;
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.primaryColor;
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
+    final cardBg = isDark ? const Color(0xFF161B22) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
 
-    final items = _all.where((e) => e.tab == _tab).toList()
-      ..sort((a, b) => b.time.compareTo(a.time));
+    final displayList = _filteredNotifications;
 
-    final today = items
-        .where((e) => _isSameDay(e.time, DateTime.now()))
+    final todayItems = displayList.where((n) => _isSameDay(n.time, DateTime.now())).toList();
+    final yesterdayItems = displayList
+        .where((n) => _isSameDay(n.time, DateTime.now().subtract(const Duration(days: 1))))
         .toList();
-    final yesterday = items
-        .where(
-          (e) => _isSameDay(
-            e.time,
-            DateTime.now().subtract(const Duration(days: 1)),
-          ),
-        )
+    final earlierItems = displayList
+        .where((n) =>
+            !_isSameDay(n.time, DateTime.now()) &&
+            !_isSameDay(n.time, DateTime.now().subtract(const Duration(days: 1))))
         .toList();
 
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF090D14) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        leading: const BackButton(),
+        backgroundColor: isDark ? const Color(0xFF090D14) : const Color(0xFFF8FAFC),
+        elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
-        title: const Text('Notification'),
+        leading: IconButton(
+          icon: Icon(CupertinoIcons.back, color: textPrimary),
+          onPressed: () => Navigator.maybePop(context),
+        ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              context.tr('notifications_title'),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: textPrimary,
+              ),
+            ),
+            if (_totalUnread > 0) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$_totalUnread',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
         actions: [
-          IconButton(
-            tooltip: 'Settings',
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () {
-              // TODO: open notification settings
-            },
-          ),
+          if (_notifications.any((n) => n.isUnread))
+            TextButton(
+              onPressed: _markAllAsRead,
+              child: Text(
+                context.tr('mark_all_read'),
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          const SizedBox(width: 4),
         ],
       ),
       body: Column(
         children: [
-          // Tabs (pill segmented look)
+          // Category Pill Tabs
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-            child: DecoratedBox(
-              decoration: ShapeDecoration(
-                color: cs.surfaceContainerHighest,
-                shape: const StadiumBorder(),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(6),
-                child: Row(
-                  children: [
-                    _SegmentChip(
-                      label: 'General',
-                      selected: _tab == NoticeTab.general,
-                      onTap: () => setState(() => _tab = NoticeTab.general),
-                    ),
-                    const SizedBox(width: 8),
-                    _SegmentChip(
-                      label: 'Promotions',
-                      selected: _tab == NoticeTab.promotions,
-                      onTap: () => setState(() => _tab = NoticeTab.promotions),
-                    ),
-                  ],
-                ),
+            padding: const EdgeInsets.fromLTRB(18, 6, 18, 12),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: [
+                  _CategoryFilterChip(
+                    label: '${context.tr('filter_all')} (${_countFor(NoticeCategory.all)})',
+                    selected: _selectedCategory == NoticeCategory.all,
+                    onTap: () => setState(() => _selectedCategory = NoticeCategory.all),
+                    primaryColor: primaryColor,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
+                  _CategoryFilterChip(
+                    label: '${context.tr('filter_orders')} (${_countFor(NoticeCategory.orders)})',
+                    selected: _selectedCategory == NoticeCategory.orders,
+                    onTap: () => setState(() => _selectedCategory = NoticeCategory.orders),
+                    primaryColor: primaryColor,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
+                  _CategoryFilterChip(
+                    label: '${context.tr('filter_promos')} (${_countFor(NoticeCategory.promos)})',
+                    selected: _selectedCategory == NoticeCategory.promos,
+                    onTap: () => setState(() => _selectedCategory = NoticeCategory.promos),
+                    primaryColor: primaryColor,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
+                  _CategoryFilterChip(
+                    label: '${context.tr('filter_system')} (${_countFor(NoticeCategory.system)})',
+                    selected: _selectedCategory == NoticeCategory.system,
+                    onTap: () => setState(() => _selectedCategory = NoticeCategory.system),
+                    primaryColor: primaryColor,
+                    isDark: isDark,
+                  ),
+                ],
               ),
             ),
           ),
-          const Divider(height: 1),
 
-          // List
+          // Notifications List View
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-              children: [
-                if (today.isNotEmpty) ...[
-                  const SectionHeader.divider(title: 'Today'),
-
-                  const SizedBox(height: 8),
-                  ...today.map((n) => _NoticeTile(item: n)),
-                  const SizedBox(height: 16),
-                ],
-                if (yesterday.isNotEmpty) ...[
-                  const SectionHeader.divider(title: 'Yesterday'),
-                  const SizedBox(height: 8),
-                  ...yesterday.map((n) => _NoticeTile(item: n)),
-                ],
-                if (today.isEmpty && yesterday.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 48),
-                    child: Center(
-                      child: Text(
-                        'No notifications',
-                        style: text.bodyLarge?.copyWith(color: cs.outline),
-                      ),
-                    ),
+            child: displayList.isEmpty
+                ? _EmptyNotificationState(isDark: isDark, primaryColor: primaryColor)
+                : ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 40),
+                    children: [
+                      if (todayItems.isNotEmpty) ...[
+                        _DateGroupHeader(title: 'Today', textSecondary: textSecondary),
+                        const SizedBox(height: 8),
+                        ...todayItems.map((n) => _NotificationTile(
+                              item: n,
+                              isDark: isDark,
+                              cardBg: cardBg,
+                              borderColor: borderColor,
+                              textPrimary: textPrimary,
+                              textSecondary: textSecondary,
+                              primaryColor: primaryColor,
+                              onTap: () => _handleNotificationTap(n),
+                              onDelete: () => _deleteNotification(n),
+                            )),
+                        const SizedBox(height: 14),
+                      ],
+                      if (yesterdayItems.isNotEmpty) ...[
+                        _DateGroupHeader(title: 'Yesterday', textSecondary: textSecondary),
+                        const SizedBox(height: 8),
+                        ...yesterdayItems.map((n) => _NotificationTile(
+                              item: n,
+                              isDark: isDark,
+                              cardBg: cardBg,
+                              borderColor: borderColor,
+                              textPrimary: textPrimary,
+                              textSecondary: textSecondary,
+                              primaryColor: primaryColor,
+                              onTap: () => _handleNotificationTap(n),
+                              onDelete: () => _deleteNotification(n),
+                            )),
+                        const SizedBox(height: 14),
+                      ],
+                      if (earlierItems.isNotEmpty) ...[
+                        _DateGroupHeader(title: 'Earlier', textSecondary: textSecondary),
+                        const SizedBox(height: 8),
+                        ...earlierItems.map((n) => _NotificationTile(
+                              item: n,
+                              isDark: isDark,
+                              cardBg: cardBg,
+                              borderColor: borderColor,
+                              textPrimary: textPrimary,
+                              textSecondary: textSecondary,
+                              primaryColor: primaryColor,
+                              onTap: () => _handleNotificationTap(n),
+                              onDelete: () => _deleteNotification(n),
+                            )),
+                      ],
+                    ],
                   ),
-              ],
-            ),
           ),
         ],
       ),
@@ -194,41 +375,59 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 }
 
-// --- Parts ---
-
-class _SegmentChip extends StatelessWidget {
+class _CategoryFilterChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _SegmentChip({
+  final Color primaryColor;
+  final bool isDark;
+
+  const _CategoryFilterChip({
     required this.label,
     required this.selected,
     required this.onTap,
+    required this.primaryColor,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Expanded(
-      child: Material(
-        color: selected
-            ? const Color(0xFF528F65)
-            : Colors.transparent, // green like mock
-        shape: const StadiumBorder(),
-        child: InkWell(
-          onTap: onTap,
-          customBorder: const StadiumBorder(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Center(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: selected ? Colors.white : cs.onSurface,
-                ),
-              ),
-            ),
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected
+              ? primaryColor
+              : (isDark ? const Color(0xFF161B22) : Colors.white),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected
+                ? primaryColor
+                : (isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0)),
+          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: primaryColor.withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+            color: selected
+                ? Colors.white
+                : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B)),
           ),
         ),
       ),
@@ -236,77 +435,202 @@ class _SegmentChip extends StatelessWidget {
   }
 }
 
-class _NoticeTile extends StatelessWidget {
-  final NoticeItem item;
-  const _NoticeTile({required this.item});
+class _DateGroupHeader extends StatelessWidget {
+  final String title;
+  final Color textSecondary;
+
+  const _DateGroupHeader({required this.title, required this.textSecondary});
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
-
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.6,
+          color: textSecondary,
+        ),
+      ),
+    );
+  }
+}
+
+class _NotificationTile extends StatelessWidget {
+  final NoticeItem item;
+  final bool isDark;
+  final Color cardBg;
+  final Color borderColor;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color primaryColor;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  const _NotificationTile({
+    required this.item,
+    required this.isDark,
+    required this.cardBg,
+    required this.borderColor,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.primaryColor,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: Key(item.id),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) => onDelete(),
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEF4444),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Icon(CupertinoIcons.trash, color: Colors.white, size: 20),
+      ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: item.isUnread ? primaryColor.withValues(alpha: 0.3) : borderColor,
+            width: item.isUnread ? 1.2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
         child: InkWell(
-          onTap: () {
-            // TODO: open details; also mark read
-          },
+          borderRadius: BorderRadius.circular(20),
+          onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Leading circled icon
+                // Glowing Icon Badge
                 Container(
-                  width: 52,
-                  height: 52,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: cs.outlineVariant),
+                    gradient: LinearGradient(
+                      colors: item.gradientColors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: item.gradientColors.first.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: Icon(item.icon, size: 26),
+                  child: Center(
+                    child: Icon(item.icon, size: 20, color: Colors.white),
+                  ),
                 ),
                 const SizedBox(width: 12),
 
-                // Texts
+                // Content
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // title row
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: Text(
                               item.title,
-                              style: text.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w800,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: item.isUnread ? FontWeight.w800 : FontWeight.w600,
+                                color: textPrimary,
+                                letterSpacing: -0.2,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          // status dot + chevron
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _StatusDot(active: item.unread),
-                              const SizedBox(width: 6),
-                              const Icon(Icons.chevron_right),
-                            ],
-                          ),
+                          const SizedBox(width: 6),
+                          if (item.isUnread)
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text(item.body, style: text.bodyMedium),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
-                        _fmtTime(item.time),
-                        style: text.bodySmall?.copyWith(color: cs.outline),
+                        item.body,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: textSecondary,
+                          height: 1.35,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Footer Row: Time and Action Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _formatRelativeTime(item.time),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: textSecondary.withValues(alpha: 0.7),
+                            ),
+                          ),
+                          if (item.actionLabel != null)
+                            PressableScale(
+                              onTap: onTap,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      item.actionLabel!,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Icon(
+                                      CupertinoIcons.arrow_right,
+                                      size: 10,
+                                      color: primaryColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -318,36 +642,108 @@ class _NoticeTile extends StatelessWidget {
       ),
     );
   }
+
+  String _formatRelativeTime(DateTime t) {
+    final diff = DateTime.now().difference(t);
+    if (diff.inMinutes < 60) {
+      return '${diff.inMinutes}m ago';
+    } else if (diff.inHours < 24) {
+      return '${diff.inHours}h ago';
+    } else if (diff.inDays == 1) {
+      return 'Yesterday';
+    }
+    return '${diff.inDays}d ago';
+  }
 }
 
-class _StatusDot extends StatelessWidget {
-  final bool active;
-  const _StatusDot({required this.active});
+class _EmptyNotificationState extends StatelessWidget {
+  final bool isDark;
+  final Color primaryColor;
+
+  const _EmptyNotificationState({required this.isDark, required this.primaryColor});
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? const Color(0xFF52AA5E) : Colors.transparent;
-    final border = active ? Colors.transparent : Theme.of(context).dividerColor;
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: Border.all(color: border),
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: isDark ? 0.15 : 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                CupertinoIcons.bell_fill,
+                size: 38,
+                color: primaryColor,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              context.tr('no_notifications'),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              context.tr('no_notifications_sub'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            PressableScale(
+              onTap: () => context.go(AppRoutes.home),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColor.withValues(alpha: 0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(CupertinoIcons.sparkles, size: 16, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      context.tr('start_shopping'),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-// --- helpers ---
-
 bool _isSameDay(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;
-
-String _fmtTime(DateTime t) {
-  final h = t.hour % 12 == 0 ? 12 : t.hour % 12;
-  final m = t.minute.toString().padLeft(2, '0');
-  final ampm = t.hour >= 12 ? 'PM' : 'AM';
-  return '${h.toString().padLeft(2, '0')}:$m $ampm';
-}

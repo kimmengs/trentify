@@ -3,7 +3,7 @@ import 'package:trentify/screens/home/product_detail.dart';
 
 class VoucherChipWidget extends StatelessWidget {
   final VoucherData v;
-  const VoucherChipWidget(this.v);
+  const VoucherChipWidget(this.v, {super.key});
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;

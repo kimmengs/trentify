@@ -59,7 +59,7 @@ Future<SortOption?> showPlatformSortSheet(
                     Icon(
                       CupertinoIcons.check_mark,
                       size: 18,
-                      color: const Color(0xFF528F65),
+                      color: Theme.of(context).primaryColor,
                     ),
                     const SizedBox(width: 8),
                   ],
@@ -106,24 +106,26 @@ Future<SortOption?> showPlatformSortSheet(
               ),
               const Divider(height: 0),
               Flexible(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    for (final opt in options)
-                      RadioListTile<SortOption>(
-                        value: opt,
-                        groupValue: initial,
-                        onChanged: (v) => Navigator.pop(context, v),
-                        title: Text(
-                          sortLabel(opt),
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
+                child: RadioGroup<SortOption>(
+                  groupValue: initial,
+                  onChanged: (v) => Navigator.pop(context, v),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      for (final opt in options)
+                        RadioListTile<SortOption>(
+                          value: opt,
+                          title: Text(
+                            sortLabel(opt),
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
                           ),
+                          dense: true,
+                          activeColor: Theme.of(context).primaryColor,
                         ),
-                        dense: true,
-                        activeColor: const Color(0xFF528F65),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 8),

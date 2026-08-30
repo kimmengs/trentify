@@ -5,7 +5,7 @@ class RatingSummaryWidget extends StatelessWidget {
   final double average;
   final int totalRatings;
   final int totalReviews;
-  const RatingSummaryWidget({
+  const RatingSummaryWidget({super.key, 
     required this.average,
     required this.totalRatings,
     required this.totalReviews,

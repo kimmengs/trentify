@@ -6,6 +6,8 @@
 .pub/
 build/
 flutter_*.png
+*.sb-*
+*.mp4.sb-*
 
 # Android related
 *.apk

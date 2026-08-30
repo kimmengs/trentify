@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class GridWidget extends StatelessWidget {
-  const GridWidget({required this.children});
+  const GridWidget({super.key, required this.children});
   final List<Widget> children;
 
   @override

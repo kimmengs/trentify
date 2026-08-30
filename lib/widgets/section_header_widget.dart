@@ -85,7 +85,7 @@ class SectionHeader extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final dividerColor = Theme.of(
       context,
-    ).dividerColor.withOpacity(dividerOpacity);
+    ).dividerColor.withValues(alpha: dividerOpacity);
     return Padding(
       padding: padding,
       child: Row(
@@ -126,6 +126,7 @@ class SectionHeader extends StatelessWidget {
 
   Widget _buildCupertinoAction(BuildContext context) {
     final base = CupertinoTheme.of(context).textTheme.navTitleTextStyle;
+    final primaryColor = Theme.of(context).primaryColor;
     return Padding(
       padding: padding,
       child: Row(
@@ -140,13 +141,13 @@ class SectionHeader extends StatelessWidget {
                 children: [
                   Text(
                     actionLabel,
-                    style: const TextStyle(
-                      color: Color(0xFF528F65),
+                    style: TextStyle(
+                      color: primaryColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(actionIcon, size: 18, color: const Color(0xFF528F65)),
+                  Icon(actionIcon, size: 18, color: primaryColor),
                 ],
               ),
             ),

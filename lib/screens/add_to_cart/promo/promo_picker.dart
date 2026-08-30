@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:trentify/model/promo.dart';
@@ -93,7 +92,7 @@ class _PromoPickerPageState extends State<PromoPickerPage> {
                       height: 48,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF528F65),
+                          backgroundColor: Theme.of(context).primaryColor,
                           shape: const StadiumBorder(),
                         ),
                         onPressed: _onRedeem,
@@ -133,7 +132,7 @@ class _PromoPickerPageState extends State<PromoPickerPage> {
             height: 52,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF528F65),
+                backgroundColor: Theme.of(context).primaryColor,
                 shape: const StadiumBorder(),
               ),
               onPressed: _selectedId == null
@@ -224,11 +223,13 @@ class _PromoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final cs = theme.colorScheme;
+    final text = theme.textTheme;
     final df = DateFormat('MM/dd/yyyy');
 
-    final borderColor = selected ? const Color(0xFF528F65) : Colors.transparent;
+    final borderColor = selected ? primaryColor : Colors.transparent;
 
     final subtitle =
         '${promo.code} · Min. spend \$${promo.minSpend.toStringAsFixed(0)} · Valid till ${df.format(promo.validUntil)}';
@@ -244,8 +245,6 @@ class _PromoTile extends StatelessWidget {
             color: cs.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: borderColor, width: 1.4),
-            // grey-out if not eligible
-            // you can also overlay a banner like "Not eligible"
           ),
           child: Row(
             children: [
@@ -253,11 +252,11 @@ class _PromoTile extends StatelessWidget {
               Container(
                 width: 42,
                 height: 42,
-                decoration: const BoxDecoration(
-                  color: Color(0x22528F65),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.local_offer, color: Color(0xFF528F65)),
+                child: Icon(Icons.local_offer, color: primaryColor),
               ),
               const SizedBox(width: 12),
 
@@ -272,7 +271,7 @@ class _PromoTile extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         color: eligible
                             ? cs.onSurface
-                            : cs.onSurface.withOpacity(0.5),
+                            : cs.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -287,7 +286,7 @@ class _PromoTile extends StatelessWidget {
                 ),
               ),
 
-              if (selected) const Icon(Icons.check, color: Color(0xFF528F65)),
+              if (selected) Icon(Icons.check, color: primaryColor),
             ],
           ),
         ),

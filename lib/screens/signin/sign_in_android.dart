@@ -13,27 +13,13 @@ class _SignInPageAndroidState extends State<SignInPageAndroid> {
   final _emailCtl = TextEditingController();
   final _pwdCtl = TextEditingController();
   bool _obscure = true;
-  bool _loading = false;
+  final bool _loading = false;
 
   @override
   void dispose() {
     _emailCtl.dispose();
     _pwdCtl.dispose();
     super.dispose();
-  }
-
-  String? _validateEmail(String? v) {
-    final value = (v ?? '').trim();
-    if (value.isEmpty) return 'Email is required';
-    final re = RegExp(r'^[\w\.\-+]+@[\w\.\-]+\.[A-Za-z]{2,}$');
-    if (!re.hasMatch(value)) return 'Enter a valid email';
-    return null;
-  }
-
-  String? _validatePassword(String? v) {
-    if ((v ?? '').isEmpty) return 'Password is required';
-    if ((v ?? '').length < 6) return 'Minimum 6 characters';
-    return null;
   }
 
   Future<void> _signIn() async {
@@ -72,7 +58,7 @@ class _SignInPageAndroidState extends State<SignInPageAndroid> {
               Center(
                 child: CircleAvatar(
                   radius: 48,
-                  backgroundColor: Color(0xFF528F65),
+                  backgroundColor: Theme.of(context).primaryColor,
                   child: const Icon(
                     Icons.grid_3x3_rounded,
                     color: Colors.white,
@@ -123,7 +109,7 @@ class _SignInPageAndroidState extends State<SignInPageAndroid> {
               FilledButton(
                 onPressed: _loading ? null : _signIn,
                 style: FilledButton.styleFrom(
-                  backgroundColor: Color(0xFF528F65),
+                  backgroundColor: Theme.of(context).primaryColor,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: _loading

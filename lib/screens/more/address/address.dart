@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trentify/model/address.dart';
 
@@ -45,7 +44,6 @@ class _AddressFormPageState extends State<AddressFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
 
     final bottomSafe = MediaQuery.of(context).padding.bottom;
@@ -69,7 +67,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
           children: [
             Row(
               children: [
-                const Icon(Icons.location_on, color: Color(0xFF528F65)),
+                Icon(Icons.location_on, color: Theme.of(context).primaryColor),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -113,7 +111,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
                 Checkbox(
                   value: _isPrimary,
                   onChanged: (v) => setState(() => _isPrimary = v ?? false),
-                  activeColor: const Color(0xFF528F65),
+                  activeColor: Theme.of(context).primaryColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -134,7 +132,7 @@ class _AddressFormPageState extends State<AddressFormPage> {
             height: 52,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF528F65),
+                backgroundColor: Theme.of(context).primaryColor,
                 shape: const StadiumBorder(),
               ),
               onPressed: _onSave,

@@ -1,7 +1,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:trentify/screens/cart/cart.dart';
 // import 'package:trentify/screens/home/home.dart';
-// import 'package:trentify/screens/more/ more_page.dart';
+// import 'package:trentify/screens/more/more_page.dart';
 // import 'package:trentify/screens/my_order/my_order.dart';
 // import 'package:trentify/screens/wish_list/wish_list.dart';
 

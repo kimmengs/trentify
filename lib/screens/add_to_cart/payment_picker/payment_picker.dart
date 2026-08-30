@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trentify/model/payment_method.dart';
 
@@ -30,8 +29,6 @@ class _PaymentPickerPageState extends State<PaymentPickerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -56,7 +53,7 @@ class _PaymentPickerPageState extends State<PaymentPickerPage> {
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
         itemCount: _list.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (_, i) {
           final m = _list[i];
           final selected = m.id == _selectedId;
@@ -76,7 +73,7 @@ class _PaymentPickerPageState extends State<PaymentPickerPage> {
             height: 52,
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF528F65),
+                backgroundColor: Theme.of(context).primaryColor,
                 shape: const StadiumBorder(),
               ),
               onPressed: _selectedId == null
@@ -110,10 +107,12 @@ class _PaymentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final cs = theme.colorScheme;
+    final text = theme.textTheme;
 
-    final border = selected ? const Color(0xFF528F65) : Colors.transparent;
+    final border = selected ? primaryColor : Colors.transparent;
 
     String title;
     if (method.kind == PaymentKind.wallet) {
@@ -152,7 +151,7 @@ class _PaymentTile extends StatelessWidget {
                   ),
                 ),
               ),
-              if (selected) const Icon(Icons.check, color: Color(0xFF528F65)),
+              if (selected) Icon(Icons.check, color: primaryColor),
             ],
           ),
         ),
@@ -194,8 +193,9 @@ class _LogoCircle extends StatelessWidget {
 
   String _abbr(String s) {
     final parts = s.split(' ');
-    if (parts.length == 1)
+    if (parts.length == 1) {
       return s.substring(0, s.length >= 2 ? 2 : 1).toUpperCase();
+    }
     return (parts[0].isNotEmpty ? parts[0][0] : '') +
         (parts[1].isNotEmpty ? parts[1][0] : '');
   }

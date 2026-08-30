@@ -57,7 +57,7 @@ class AdaptiveActionButton extends StatelessWidget {
 
   // ---------- Material ----------
   Widget _buildMaterial(BuildContext context) {
-    final brand = color ?? const Color(0xFF528F65);
+    final brand = color ?? Theme.of(context).primaryColor;
     final content = _content(
       loadingWidget: const SizedBox(
         height: 18,
@@ -106,7 +106,7 @@ class AdaptiveActionButton extends StatelessWidget {
 
   // ---------- Cupertino ----------
   Widget _buildCupertino(BuildContext context) {
-    final brand = color ?? const Color(0xFF528F65);
+    final brand = color ?? Theme.of(context).primaryColor;
     final content = _content(
       loadingWidget: const CupertinoActivityIndicator(radius: 9),
       textStyle: const TextStyle(fontWeight: FontWeight.w600),
@@ -185,16 +185,6 @@ class AdaptiveActionButton extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [iconWidget, const SizedBox(width: 8), labelText],
-    );
-  }
-}
-
-// Small extension to tint Cupertino filled button background
-extension _CupertinoFilledColor on CupertinoButton {
-  Widget _withCupertinoColor(Color color) {
-    return CupertinoTheme(
-      data: CupertinoThemeData(primaryColor: color),
-      child: this,
     );
   }
 }

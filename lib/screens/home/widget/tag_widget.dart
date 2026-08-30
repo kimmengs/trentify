@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class TagWidget extends StatelessWidget {
   final String text;
-  const TagWidget({required this.text});
+  const TagWidget({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {

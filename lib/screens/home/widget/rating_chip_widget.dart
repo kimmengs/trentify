@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class RatingChipWidget extends StatelessWidget {
   final double rating;
-  const RatingChipWidget({required this.rating});
+  const RatingChipWidget({super.key, required this.rating});
 
   @override
   Widget build(BuildContext context) {
