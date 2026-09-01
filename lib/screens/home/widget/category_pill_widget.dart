@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trentify/widgets/pressable_scale.dart';
 
 class CategoryPillsWidget extends StatelessWidget {
   final List<String> tabs;
@@ -24,14 +25,15 @@ class CategoryPillsWidget extends StatelessWidget {
     final textInactive = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
 
     return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      physics: const BouncingScrollPhysics(),
       scrollDirection: Axis.horizontal,
       itemCount: tabs.length,
       separatorBuilder: (_, _) => const SizedBox(width: 8),
-      itemBuilder: (_, i) {
+      itemBuilder: (context, i) {
         final selected = i == value;
 
-        return GestureDetector(
+        return PressableScale(
           onTap: () {
             HapticFeedback.selectionClick();
             onTap(i);
@@ -39,7 +41,8 @@ class CategoryPillsWidget extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
             decoration: BoxDecoration(
               color: selected ? primaryColor : inactiveBg,
               borderRadius: BorderRadius.circular(30),
@@ -50,28 +53,26 @@ class CategoryPillsWidget extends StatelessWidget {
               boxShadow: [
                 if (selected)
                   BoxShadow(
-                    color: primaryColor.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    color: primaryColor.withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
                   )
                 else
                   BoxShadow(
                     color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                    blurRadius: 8,
+                    blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
               ],
             ),
-            child: Center(
-              child: Text(
-                tabs[i],
-                style: TextStyle(
-                  height: 1.1,
-                  fontSize: 13,
-                  color: selected ? Colors.white : textInactive,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                  letterSpacing: -0.1,
-                ),
+            child: Text(
+              tabs[i],
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                color: selected ? Colors.white : textInactive,
+                letterSpacing: -0.2,
               ),
             ),
           ),

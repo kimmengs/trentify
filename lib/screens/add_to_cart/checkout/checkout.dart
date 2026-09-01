@@ -7,6 +7,9 @@ import 'package:trentify/model/cart_item.dart';
 import 'package:trentify/model/demodb.dart';
 import 'package:trentify/model/payment_method.dart';
 import 'package:trentify/model/promo.dart';
+import 'package:trentify/provider/address_provider.dart';
+import 'package:trentify/provider/cart_provider.dart';
+import 'package:trentify/provider/order_provider.dart';
 import 'package:trentify/router/app_routes.dart';
 import 'package:trentify/screens/add_to_cart/address_picker/address_picker.dart';
 import 'package:trentify/screens/add_to_cart/payment_picker/payment_picker.dart';
@@ -45,10 +48,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void initState() {
     super.initState();
+    final addrProvider = AddressProvider.instance;
     _selectedAddress = widget.initialAddress ??
         (widget.addresses.isNotEmpty
             ? widget.addresses.first
-            : (DemoDb.addresses.isNotEmpty ? DemoDb.addresses.first : null));
+            : addrProvider.selectedAddress);
 
     if (DemoDb.demoMethods.isNotEmpty) {
       _selectedPayment = DemoDb.demoMethods.first;
@@ -90,8 +94,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final picked = await Navigator.of(context).push<Address?>(
       CupertinoPageRoute(
         builder: (_) => AddressPickerPage(
-          addresses: DemoDb.addresses,
-          initialSelectedId: _selectedAddress?.id,
+          initialSelectedId: _selectedAddress?.id ?? AddressProvider.instance.selectedAddressId,
+          isPickerMode: true,
         ),
       ),
     );
@@ -143,6 +147,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
       barrierDismissible: false,
       builder: (_) => const _ModernProcessingDialog(),
     );
+
+    // Create live order in OrderProvider
+    OrderProvider.instance.createOrderFromCart(
+      items: widget.items,
+      total: _totalPayment,
+      address: _selectedAddress?.line1,
+      paymentMethod: _selectedPayment?.name,
+    );
+
+    // Remove purchased items from Cart
+    for (final item in widget.items) {
+      CartProvider.instance.removeItem(item.id);
+    }
 
     await Future.delayed(const Duration(milliseconds: 2200));
 

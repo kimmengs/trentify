@@ -4,11 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:trentify/l10n/app_localizations.dart';
-import 'package:trentify/main.dart';
-import 'package:trentify/model/demodb.dart';
+import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/model/product.dart';
 import 'package:trentify/provider/cart_provider.dart';
+import 'package:trentify/provider/wishlist_provider.dart';
 import 'package:trentify/router/app_routes.dart';
+import 'package:trentify/screens/home/category/show_platform_sort_sheet.dart';
 import 'package:trentify/screens/home/widget/build_product_image_widget.dart';
 import 'package:trentify/screens/home/widget/category_pill_widget.dart';
 import 'package:trentify/screens/home/widget/rating_chip_widget.dart';
@@ -30,18 +31,8 @@ class _WishListPageState extends State<WishListPage> {
   bool _isSearchVisible = false;
   String _searchQuery = '';
   final _searchCtl = TextEditingController();
-
-  // Dynamic wishlist items initialized from DemoDb
-  late List<Product> _wishlistItems;
-
-  @override
-  void initState() {
-    super.initState();
-    _wishlistItems = [
-      ...DemoDb.topPicks,
-      ...DemoDb.newArrivals.take(2),
-    ];
-  }
+  SortOption _currentSort = SortOption.mostSuitable;
+  FilterResult _currentFilter = FilterResult.initial();
 
   @override
   void dispose() {
@@ -51,9 +42,7 @@ class _WishListPageState extends State<WishListPage> {
 
   void _removeFromWishlist(Product product) {
     HapticFeedback.mediumImpact();
-    setState(() {
-      _wishlistItems.removeWhere((p) => p.title == product.title);
-    });
+    context.read<WishlistProvider>().removeProduct(product);
     ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
@@ -62,9 +51,7 @@ class _WishListPageState extends State<WishListPage> {
         action: SnackBarAction(
           label: 'Undo',
           onPressed: () {
-            setState(() {
-              _wishlistItems.add(product);
-            });
+            context.read<WishlistProvider>().addProduct(product);
           },
         ),
       ),
@@ -103,10 +90,10 @@ class _WishListPageState extends State<WishListPage> {
     );
   }
 
-  void _moveAllToBag() {
+  void _moveAllToBag(List<Product> items) {
     HapticFeedback.heavyImpact();
     final cart = context.read<CartProvider>();
-    for (final product in _wishlistItems) {
+    for (final product in items) {
       cart.addToCart(
         title: product.title,
         price: product.price,
@@ -120,7 +107,7 @@ class _WishListPageState extends State<WishListPage> {
     ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        content: Text('All ${_wishlistItems.length} items moved to shopping bag!'),
+        content: Text('All ${items.length} items moved to shopping bag!'),
         action: SnackBarAction(
           label: context.tr('view_bag'),
           textColor: Colors.amberAccent,
@@ -147,7 +134,7 @@ class _WishListPageState extends State<WishListPage> {
             isDestructiveAction: true,
             onPressed: () {
               Navigator.pop(ctx);
-              setState(() => _wishlistItems.clear());
+              context.read<WishlistProvider>().clearWishlist();
             },
             child: Text(context.tr('clear')),
           ),
@@ -156,24 +143,84 @@ class _WishListPageState extends State<WishListPage> {
     );
   }
 
-  List<Product> get _filteredItems {
-    var list = _wishlistItems;
+  List<Product> _filterProducts(List<Product> allItems) {
+    var list = List<Product>.from(allItems);
 
-    // Filter by category tab
+    // 1. Filter by category tab
     if (_selectedTab == 1) {
-      list = list.where((p) => p.title.toLowerCase().contains('shirt') || p.title.toLowerCase().contains('hoodie') || p.title.toLowerCase().contains('top')).toList();
+      list = list.where((p) {
+        final c = p.category.toLowerCase();
+        final t = p.title.toLowerCase();
+        return c == 'women' || c == 'men' || t.contains('shirt') || t.contains('hoodie') || t.contains('top') || t.contains('tee') || t.contains('dress') || t.contains('gown') || t.contains('knit') || t.contains('trench');
+      }).toList();
     } else if (_selectedTab == 2) {
-      list = list.where((p) => p.title.toLowerCase().contains('shoe') || p.title.toLowerCase().contains('sneaker')).toList();
+      list = list.where((p) {
+        final c = p.category.toLowerCase();
+        final t = p.title.toLowerCase();
+        return c == 'shoe' || c == 'shoes' || t.contains('shoe') || t.contains('sneaker') || t.contains('loafer') || t.contains('boot') || t.contains('pump');
+      }).toList();
     } else if (_selectedTab == 3) {
-      list = list.where((p) => p.title.toLowerCase().contains('bag')).toList();
+      list = list.where((p) {
+        final c = p.category.toLowerCase();
+        final t = p.title.toLowerCase();
+        return c == 'bag' || c == 'bags' || t.contains('bag') || t.contains('tote') || t.contains('duffle') || t.contains('crossbody');
+      }).toList();
     } else if (_selectedTab == 4) {
-      list = list.where((p) => p.title.toLowerCase().contains('blazer') || p.title.toLowerCase().contains('formal')).toList();
+      list = list.where((p) {
+        final c = p.category.toLowerCase();
+        final t = p.title.toLowerCase();
+        return c == 'luxury' || t.contains('gold') || t.contains('watch') || t.contains('cashmere') || t.contains('diamond') || t.contains('blazer') || t.contains('formal');
+      }).toList();
     }
 
-    // Filter by search query
+    // 2. Filter by search query
     if (_searchQuery.trim().isNotEmpty) {
       final q = _searchQuery.trim().toLowerCase();
       list = list.where((p) => p.title.toLowerCase().contains(q)).toList();
+    }
+
+    // 3. Dynamic Filter Sheet Categories
+    if (_currentFilter.categories.isNotEmpty) {
+      list = list.where((p) {
+        final title = p.title.toLowerCase();
+        return _currentFilter.categories.any((c) {
+          final cat = c.toLowerCase();
+          if (cat == 'clothing') return title.contains('shirt') || title.contains('hoodie') || title.contains('blazer') || title.contains('coat') || title.contains('jacket') || title.contains('dress');
+          if (cat == 'shoe') return title.contains('shoe') || title.contains('sneaker') || title.contains('loafer') || title.contains('boot');
+          if (cat == 'bag') return title.contains('bag') || title.contains('tote') || title.contains('backpack');
+          if (cat == 'luxury') return title.contains('silk') || title.contains('wool') || title.contains('leather') || title.contains('blazer') || title.contains('gold');
+          if (cat == 'accessories') return title.contains('belt') || title.contains('wallet') || title.contains('hat') || title.contains('sunglass');
+          return title.contains(cat);
+        });
+      }).toList();
+    }
+
+    // 4. Dynamic Price Range Filter
+    list = list.where((p) => p.price >= _currentFilter.priceRange.start && p.price <= _currentFilter.priceRange.end).toList();
+
+    // 5. Dynamic Rating Filter
+    if (_currentFilter.ratingAtLeast != null) {
+      list = list.where((p) => p.rating >= _currentFilter.ratingAtLeast!).toList();
+    }
+
+    // 6. Dynamic Sort Option
+    switch (_currentSort) {
+      case SortOption.priceLowToHigh:
+        list.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case SortOption.priceHighToLow:
+        list.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case SortOption.topRated:
+        list.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+      case SortOption.latestArrival:
+        list = list.reversed.toList();
+        break;
+      case SortOption.popularity:
+      case SortOption.mostSuitable:
+      case SortOption.discount:
+        break;
     }
 
     return list;
@@ -188,6 +235,7 @@ class _WishListPageState extends State<WishListPage> {
     final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
     final cardBg = isDark ? const Color(0xFF161B22) : Colors.white;
     final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
+    final isCupertino = theme.platform == TargetPlatform.iOS || theme.platform == TargetPlatform.macOS;
 
     final tabs = [
       context.tr('tab_all_items'),
@@ -197,7 +245,9 @@ class _WishListPageState extends State<WishListPage> {
       context.tr('tab_luxury'),
     ];
 
-    final displayItems = _filteredItems;
+    final wishlist = context.watch<WishlistProvider>();
+    final rawItems = wishlist.items;
+    final displayItems = _filterProducts(rawItems);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF090D14) : const Color(0xFFF8FAFC),
@@ -207,7 +257,7 @@ class _WishListPageState extends State<WishListPage> {
         scrolledUnderElevation: 0,
         centerTitle: true,
         title: Text(
-          '${context.tr('nav_wishlist')} (${_wishlistItems.length})',
+          '${context.tr('nav_wishlist')} (${rawItems.length})',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -254,14 +304,14 @@ class _WishListPageState extends State<WishListPage> {
           ),
 
           // Overflow Menu (Move All / Clear All)
-          if (_wishlistItems.isNotEmpty)
+          if (rawItems.isNotEmpty)
             PopupMenuButton<String>(
               icon: Icon(CupertinoIcons.ellipsis, size: 20, color: textPrimary),
               color: cardBg,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               onSelected: (val) {
                 if (val == 'move_all') {
-                  _moveAllToBag();
+                  _moveAllToBag(rawItems);
                 } else if (val == 'clear_all') {
                   _clearAllWishlist();
                 }
@@ -442,6 +492,14 @@ class _WishListPageState extends State<WishListPage> {
                 context: context,
                 isCupertino: isCupertino,
                 isDark: isDark,
+                currentSort: _currentSort,
+                currentFilter: _currentFilter,
+                onSortChanged: (sort) {
+                  setState(() => _currentSort = sort);
+                },
+                onFilterChanged: (filter) {
+                  setState(() => _currentFilter = filter);
+                },
               ),
             ),
           ),
@@ -480,7 +538,7 @@ class _WishlistGridCard extends StatelessWidget {
       onTap: () {
         context.pushNamed(
           'product-detail',
-          pathParameters: {'id': 'ubl-ss-001'},
+          pathParameters: {'id': product.effectiveId},
         );
       },
       child: Container(

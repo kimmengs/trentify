@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/provider/cart_provider.dart';
+import 'package:trentify/provider/order_provider.dart';
 import 'package:trentify/screens/my_order/my_order.dart';
 
 const List<int> _kTransparentImage = <int>[
@@ -89,6 +90,9 @@ void main() {
       providers: [
         ChangeNotifierProvider<CartProvider>.value(
           value: CartProvider.instance,
+        ),
+        ChangeNotifierProvider<OrderProvider>.value(
+          value: OrderProvider.instance,
         ),
       ],
       child: MaterialApp(

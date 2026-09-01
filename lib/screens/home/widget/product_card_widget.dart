@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:trentify/model/product.dart';
+import 'package:trentify/provider/wishlist_provider.dart';
 import 'package:trentify/screens/home/widget/build_product_image_widget.dart';
 import 'package:trentify/screens/home/widget/rating_chip_widget.dart';
 import 'package:trentify/widgets/animated_favorite_button.dart';
@@ -14,6 +16,8 @@ class ProductCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final wishlist = context.watch<WishlistProvider>();
+    final isFav = wishlist.isProductFavorite(product);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.primaryColor;
@@ -39,7 +43,7 @@ class ProductCardWidget extends StatelessWidget {
           onTap: () {
             context.pushNamed(
               'product-detail',
-              pathParameters: {'id': 'ubl-ss-001'},
+              pathParameters: {'id': product.effectiveId},
             );
           },
           child: Container(
@@ -84,8 +88,10 @@ class ProductCardWidget extends StatelessWidget {
                         top: 8,
                         right: 8,
                         child: AnimatedFavoriteButton(
-                          initialIsFavorite: false,
-                          onChanged: (val) {},
+                          initialIsFavorite: isFav,
+                          onChanged: (val) {
+                            wishlist.toggleFavorite(product);
+                          },
                         ),
                       ),
                     ],

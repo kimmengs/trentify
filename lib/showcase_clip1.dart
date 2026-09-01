@@ -8,10 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/l10n/locale_controller.dart';
 import 'package:trentify/model/cart_item.dart';
-import 'package:trentify/model/demodb.dart';
+import 'package:trentify/provider/address_provider.dart';
 import 'package:trentify/provider/cart_provider.dart';
+import 'package:trentify/provider/order_provider.dart';
 import 'package:trentify/provider/product_provider.dart';
-import 'package:trentify/provider/seller_provider.dart';
+import 'package:trentify/provider/wishlist_provider.dart';
 import 'package:trentify/router/app_router.dart';
 import 'package:trentify/router/app_routes.dart';
 import 'package:trentify/theme/app_theme.dart';
@@ -19,7 +20,7 @@ import 'package:trentify/theme/cupertino_theme.dart';
 import 'package:trentify/theme/theme_controller.dart';
 
 final ValueNotifier<String> chapterNotifier =
-    ValueNotifier<String>('✨ WEBUY UAT • LUXURY EXPERIENCE');
+    ValueNotifier<String>('🔐 BUYER ROLE • 1-TAP VIP ACCESS');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,28 +37,34 @@ Future<void> main() async {
         ChangeNotifierProvider<LocaleController>(
           create: (_) => LocaleController(prefs),
         ),
+        ChangeNotifierProvider<AddressProvider>(
+          create: (_) => AddressProvider.instance,
+        ),
         ChangeNotifierProvider<CartProvider>(
           create: (_) => CartProvider.instance,
         ),
-        ChangeNotifierProvider<SellerProvider>(
-          create: (_) => SellerProvider(),
+        ChangeNotifierProvider<WishlistProvider>(
+          create: (_) => WishlistProvider.instance,
+        ),
+        ChangeNotifierProvider<OrderProvider>(
+          create: (_) => OrderProvider.instance,
         ),
         Provider<ProductRepository>(create: (_) => InMemoryProductRepository()),
       ],
-      child: ShowcaseApp(router: router),
+      child: Clip1App(router: router),
     ),
   );
 }
 
-class ShowcaseApp extends StatefulWidget {
+class Clip1App extends StatefulWidget {
   final GoRouter router;
-  const ShowcaseApp({super.key, required this.router});
+  const Clip1App({super.key, required this.router});
 
   @override
-  State<ShowcaseApp> createState() => _ShowcaseAppState();
+  State<Clip1App> createState() => _Clip1AppState();
 }
 
-class _ShowcaseAppState extends State<ShowcaseApp> {
+class _Clip1AppState extends State<Clip1App> {
   @override
   void initState() {
     super.initState();
@@ -65,70 +72,59 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
   }
 
   Future<void> _startTimeline() async {
-    // Populate sample cart items for checkout & bag
-    CartProvider.instance.addToCart(
-      productId: '1',
-      title: 'Haute Couture Classic Blazer',
-      price: 289.0,
-      imageUrl:
-          'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop',
-      size: 'M',
-      colorName: 'Obsidian Black',
-      color: const Color(0xFF111214),
-    );
+    // Reset providers for clean demo
+    CartProvider.instance.clearCart();
 
     await Future.delayed(const Duration(milliseconds: 1000));
 
-    // SCENE 1: AUTH & VIP ONBOARDING (0s - 5s)
-    chapterNotifier.value = '🔐 VIP AUTHENTICATION • 1-TAP ACCESS';
+    // STEP 1: VIP LOGIN & AUTHENTICATION (0s - 4s)
+    chapterNotifier.value = '🔐 1. BUYER LOGIN • 1-TAP VIP ACCESS';
     widget.router.go(AppRoutes.signIn);
-    await Future.delayed(const Duration(milliseconds: 5000));
+    await Future.delayed(const Duration(milliseconds: 4000));
 
-    // SCENE 2: BUYER HOME FEED & LIQUID GLASS (5s - 10s)
-    chapterNotifier.value = '🛍️ BUYER HUB • LIQUID GLASS FEED';
+    // STEP 2: HOME DISCOVERY & PRODUCT BROWSING (4s - 9s)
+    chapterNotifier.value = '🛍️ 2. EXPLORE CATALOG • LUXURY FEED';
     widget.router.go(AppRoutes.home);
     await Future.delayed(const Duration(milliseconds: 5000));
 
-    // SCENE 3: PRODUCT DETAIL (10s - 15s)
-    chapterNotifier.value = '💎 HAUTE COUTURE • PRODUCT SHOWCASE';
-    widget.router.push('/product/detail/1');
-    await Future.delayed(const Duration(milliseconds: 5000));
+    // STEP 3: PRODUCT DETAIL & VARIANT SELECTION (9s - 16s)
+    chapterNotifier.value = '💎 3. PRODUCT DETAIL • SELECT SIZE & COLOR';
+    widget.router.push('/product/detail/ubl-ss-001');
+    await Future.delayed(const Duration(milliseconds: 4000));
 
-    // SCENE 4: LIVE INQUIRY CHAT WITH SELLER (15s - 20s)
-    chapterNotifier.value = '💬 DIRECT CONCIERGE • CHAT WITH SELLER';
-    final productData = DemoDb.productDetailById('1');
-    widget.router.push(
-      AppRoutes.productChat,
-      extra: {
-        'product': productData,
-        'selectedSize': 'M',
-        'selectedColor': 'Obsidian Black',
-      },
+    // Add item to cart programmatically
+    CartProvider.instance.addToCart(
+      productId: 'ubl-ss-001',
+      title: 'Urban Blend Long Sleeve',
+      price: 185.00,
+      imageUrl:
+          'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop',
+      size: 'M',
+      colorName: 'Obsidian Black',
+      color: const Color(0xFF111214),
+      qty: 1,
     );
-    await Future.delayed(const Duration(milliseconds: 5000));
 
-    // SCENE 5: WISHLIST (20s - 25s)
-    chapterNotifier.value = '❤️ CURATED WISHLIST • DUAL LAYOUT';
-    widget.router.go(AppRoutes.home, extra: {'tabIndex': 1});
-    await Future.delayed(const Duration(milliseconds: 5000));
+    chapterNotifier.value = '✨ 4. ADD TO BAG • OBSIDIAN BLACK (M)';
+    await Future.delayed(const Duration(milliseconds: 3000));
 
-    // SCENE 6: SHOPPING BAG (25s - 30s)
-    chapterNotifier.value = '👜 SHOPPING BAG • VIP SHIPPING TRACKER';
+    // STEP 4: SHOPPING BAG REVIEW (16s - 22s)
+    chapterNotifier.value = '👜 5. SHOPPING BAG • REVIEW SELECTION';
     widget.router.go(AppRoutes.home, extra: {'tabIndex': 2});
     await Future.delayed(const Duration(milliseconds: 5000));
 
-    // SCENE 7: 3-STEP LUXURY CHECKOUT (30s - 36s)
-    chapterNotifier.value = '💳 3-STEP CHECKOUT • DHL PRIORITY';
+    // STEP 5: 3-STEP LUXURY CHECKOUT & PAYMENT (22s - 29s)
+    chapterNotifier.value = '💳 6. 3-STEP CHECKOUT • DHL PRIORITY & VISA';
     widget.router.push(
       AppRoutes.checkout,
       extra: [
         CartItem(
-          id: 'item_1',
-          productId: '1',
-          title: 'Haute Couture Classic Blazer',
-          price: 289.0,
+          id: 'item_ubl_1',
+          productId: 'ubl-ss-001',
+          title: 'Urban Blend Long Sleeve',
+          price: 185.00,
           imageUrl:
-              'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop',
+              'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop',
           size: 'M',
           colorName: 'Obsidian Black',
           color: const Color(0xFF111214),
@@ -136,73 +132,24 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
         ),
       ],
     );
-    await Future.delayed(const Duration(milliseconds: 5500));
+    await Future.delayed(const Duration(milliseconds: 6500));
 
-    // SCENE 8: MY ORDERS & LIVE COURIER TRACKING (36s - 42s)
-    chapterNotifier.value = '📦 ORDER MANAGEMENT • LIVE DHL TRACKING';
+    // STEP 6: ORDER COMPLETE CONFIRMATION (29s - 35s)
+    chapterNotifier.value = '🎉 7. PURCHASE COMPLETED • ORDER CONFIRMED';
     widget.router.go(AppRoutes.home, extra: {'tabIndex': 3});
     await Future.delayed(const Duration(milliseconds: 5500));
-
-    // SCENE 9: SELLER CENTER & REVENUE ANALYTICS (42s - 48s)
-    chapterNotifier.value = '🏪 SELLER CENTER • REVENUE & ESCROW';
-    widget.router.push(AppRoutes.seller);
-    await Future.delayed(const Duration(milliseconds: 6000));
-
-    // SCENE 10: VIP PROFILE & MEMBERSHIP (48s - 54s)
-    chapterNotifier.value = '👤 VIP ELITE PROFILE & MEMBERSHIP';
-    widget.router.push(AppRoutes.editProfile);
-    await Future.delayed(const Duration(milliseconds: 5000));
-
-    // SCENE 11: THEME STUDIO & DARK NOIR (54s - 68s)
-    chapterNotifier.value = '🎨 THEME STUDIO • DARK OBSIDIAN NOIR';
-    widget.router.push(AppRoutes.theme);
-    await Future.delayed(const Duration(milliseconds: 2500));
-
-    if (mounted) {
-      final themeCtl = context.read<ThemeController>();
-      themeCtl.setMode(AppThemeMode.dark);
-    }
-    await Future.delayed(const Duration(milliseconds: 3000));
-
-    chapterNotifier.value = '💎 LUXURY PALETTE • EMERALD VELVET';
-    if (mounted) {
-      final themeCtl = context.read<ThemeController>();
-      themeCtl.setSeed(const Color(0xFF10B981));
-    }
-    await Future.delayed(const Duration(milliseconds: 3000));
-
-    chapterNotifier.value = '🌸 LUXURY PALETTE • ROSE GOLD COUTURE';
-    if (mounted) {
-      final themeCtl = context.read<ThemeController>();
-      themeCtl.setSeed(const Color(0xFFEC4899));
-    }
-    await Future.delayed(const Duration(milliseconds: 3000));
-
-    chapterNotifier.value = '🔷 LUXURY PALETTE • IMPERIAL SAPPHIRE';
-    if (mounted) {
-      final themeCtl = context.read<ThemeController>();
-      themeCtl.setSeed(const Color(0xFF4F77FE));
-    }
-    await Future.delayed(const Duration(milliseconds: 3000));
-
-    // SCENE 12: FINALE ON HOME IN DARK OBSIDIAN (68s - 75s)
-    chapterNotifier.value = '✨ WEBUY UAT • MAISON LUXURY MARKETPLACE';
-    widget.router.go(AppRoutes.home);
-    await Future.delayed(const Duration(milliseconds: 6000));
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<ThemeController>();
     final localeCtl = context.watch<LocaleController>();
-    final isDark = theme.mode == AppThemeMode.dark ||
-        (theme.mode == AppThemeMode.system &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
+    final isDark = theme.mode == AppThemeMode.dark;
 
     return MaterialApp.router(
       routerConfig: widget.router,
       debugShowCheckedModeBanner: false,
-      title: 'WeBuy UAT',
+      title: 'Clip 1 - Purchase Flow',
       theme: buildMaterialTheme(
         brightness: Brightness.light,
         seed: theme.seed,
@@ -229,11 +176,11 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
           child: Stack(
             children: [
               child ?? const SizedBox.shrink(),
-              // Luxury Chapter Header Pill
+              // Professional floating header badge
               Positioned(
                 top: 54,
-                left: 20,
-                right: 20,
+                left: 18,
+                right: 18,
                 child: ValueListenableBuilder<String>(
                   valueListenable: chapterNotifier,
                   builder: (context, title, _) {
@@ -262,7 +209,7 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
                                 offset: const Offset(0, 4),
                               ),
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
+                                color: Colors.black.withValues(alpha: 0.15),
                                 blurRadius: 10,
                                 offset: const Offset(0, 2),
                               ),
@@ -273,7 +220,7 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
-                              letterSpacing: 0.6,
+                              letterSpacing: 0.5,
                               color: isDark
                                   ? Colors.white
                                   : const Color(0xFF0F172A),

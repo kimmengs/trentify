@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/l10n/locale_controller.dart';
+import 'package:trentify/provider/address_provider.dart';
 import 'package:trentify/provider/cart_provider.dart';
 import 'package:trentify/router/app_routes.dart';
+import 'package:trentify/screens/more/vip_rewards_sheet.dart';
 import 'package:trentify/theme/theme_controller.dart';
 import 'package:trentify/widgets/animated_entry.dart';
 import 'package:trentify/widgets/app_badge_pill.dart';
@@ -114,6 +116,7 @@ class MorePage extends StatelessWidget {
     final localeCtl = context.watch<LocaleController>();
     final themeCtl = context.watch<ThemeController>();
     final cart = context.watch<CartProvider>();
+    final addressProvider = context.watch<AddressProvider>();
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF090D14) : const Color(0xFFF8FAFC),
@@ -229,10 +232,13 @@ class MorePage extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 6),
-                                  const AppBadgePill(
-                                    label: 'VIP ELITE',
-                                    variant: BadgeVariant.vip,
-                                    fontSize: 9,
+                                  GestureDetector(
+                                    onTap: () => VipRewardsSheet.show(context),
+                                    child: const AppBadgePill(
+                                      label: 'VIP ELITE',
+                                      variant: BadgeVariant.vip,
+                                      fontSize: 9,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -420,6 +426,25 @@ class MorePage extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
+                    _LiquidSettingsTile(
+                      icon: CupertinoIcons.star_circle_fill,
+                      gradientColors: const [Color(0xFFF59E0B), Color(0xFFD97706)],
+                      title: 'VIP Rewards & Loyalty Points',
+                      subtitle: '2,450 pts (≈ \$24.50 Available)',
+                      onTap: () => VipRewardsSheet.show(context),
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
+                    ),
+                    _LiquidSettingsTile(
+                      icon: CupertinoIcons.location_solid,
+                      gradientColors: const [Color(0xFFEC4899), Color(0xFFF43F5E)],
+                      title: 'Shipping & Delivery Addresses',
+                      subtitle: '${addressProvider.addresses.length} Saved Addresses • ${addressProvider.primaryAddress?.label ?? 'None'} (Default)',
+                      onTap: () => context.push(AppRoutes.addressPicker, extra: {'isPickerMode': false}),
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
+                    ),
+                    _GlassDivider(isDark: isDark),
                     _LiquidSettingsTile(
                       icon: CupertinoIcons.color_filter,
                       gradientColors: const [Color(0xFF10B981), Color(0xFF34D399)],

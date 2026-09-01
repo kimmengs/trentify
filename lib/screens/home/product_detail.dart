@@ -3,17 +3,24 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:trentify/helper/format_number.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/demodb.dart';
 import 'package:trentify/model/filter_result.dart';
+import 'package:trentify/model/product.dart';
 import 'package:trentify/provider/cart_provider.dart';
 import 'package:trentify/provider/seller_provider.dart';
+import 'package:trentify/provider/wishlist_provider.dart';
+import 'package:trentify/router/app_routes.dart';
 import 'package:trentify/screens/add_to_cart/add_to_cart.dart';
 import 'package:trentify/screens/chat/product_chat_page.dart';
 import 'package:trentify/screens/home/widget/horizontal_products.dart';
 import 'package:trentify/screens/home/widget/rating_summary_widget.dart';
 import 'package:trentify/screens/home/widget/review_tile_widget.dart';
+import 'package:trentify/screens/home/widget/sizing_guide_sheet.dart';
+import 'package:trentify/screens/home/widget/write_review_sheet.dart';
 import 'package:trentify/widgets/pressable_scale.dart';
 
 final colorDots = const <String, Color>{
@@ -123,7 +130,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   late String _selectedColorName;
   final _pageController = PageController();
   int _imageIndex = 0;
-  bool _isWishlisted = false;
   bool _isAdded = false;
   Timer? _addedResetTimer;
 
@@ -132,11 +138,41 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   bool _specsOpen = true;
   bool _deliveryOpen = false;
 
+  // Dynamic Reviews
+  late List<ReviewData> _dynamicReviews;
+
   @override
   void initState() {
     super.initState();
     _size = widget.data.sizes.isNotEmpty ? widget.data.sizes.first : 'M';
     _selectedColorName = widget.initial.colorName ?? 'Black';
+    _dynamicReviews = List.from(widget.data.reviews);
+  }
+
+  void _handleBuyNow() {
+    HapticFeedback.heavyImpact();
+    final selectedColorValue = colorDots[_selectedColorName] ??
+        (widget.data.colors.isNotEmpty
+            ? widget.data.colors.first
+            : const Color(0xFF111214));
+    final firstImage = widget.data.images.isNotEmpty
+        ? widget.data.images.first
+        : '';
+
+    final directItem = CartItem(
+      id: 'direct_${DateTime.now().millisecondsSinceEpoch}',
+      title: widget.data.title,
+      price: widget.data.price,
+      imageUrl: firstImage,
+      size: _size,
+      colorName: _selectedColorName,
+      color: selectedColorValue,
+      qty: 1,
+      selected: true,
+      stock: 10,
+    );
+
+    context.push(AppRoutes.checkout, extra: [directItem]);
   }
 
   @override
@@ -286,96 +322,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  void _showSizeGuideModal(BuildContext context, bool isDark, Color cardBg, Color borderColor, Color textPrimary, Color textSecondary, Color primaryColor) {
-    HapticFeedback.lightImpact();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF161B22) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF30363D) : const Color(0xFFCBD5E1),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    context.tr('size_guide'),
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: textPrimary),
-                  ),
-                  IconButton(
-                    icon: const Icon(CupertinoIcons.xmark_circle_fill, size: 20),
-                    onPressed: () => Navigator.pop(ctx),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Garment measurements in inches. Fits true to size with a tailored silhouette.',
-                style: TextStyle(fontSize: 12, color: textSecondary),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: borderColor),
-                ),
-                child: Table(
-                  border: TableBorder.symmetric(inside: BorderSide(color: borderColor, width: 0.8)),
-                  children: [
-                    TableRow(
-                      decoration: BoxDecoration(color: isDark ? const Color(0xFF1F2937) : const Color(0xFFF1F5F9)),
-                      children: const [
-                        Padding(padding: EdgeInsets.all(10), child: Text('Size', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12))),
-                        Padding(padding: EdgeInsets.all(10), child: Text('Chest', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12))),
-                        Padding(padding: EdgeInsets.all(10), child: Text('Length', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12))),
-                        Padding(padding: EdgeInsets.all(10), child: Text('Shoulder', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12))),
-                      ],
-                    ),
-                    _tableRow('XS', '36 - 38"', '27.5"', '17.0"'),
-                    _tableRow('S', '38 - 40"', '28.0"', '17.5"'),
-                    _tableRow('M', '40 - 42"', '28.5"', '18.0"'),
-                    _tableRow('L', '42 - 44"', '29.0"', '18.5"'),
-                    _tableRow('XL', '44 - 46"', '29.5"', '19.0"'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  TableRow _tableRow(String s, String c, String l, String sh) {
-    return TableRow(
-      children: [
-        Padding(padding: const EdgeInsets.all(10), child: Text(s, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
-        Padding(padding: const EdgeInsets.all(10), child: Text(c, style: const TextStyle(fontSize: 12))),
-        Padding(padding: const EdgeInsets.all(10), child: Text(l, style: const TextStyle(fontSize: 12))),
-        Padding(padding: const EdgeInsets.all(10), child: Text(sh, style: const TextStyle(fontSize: 12))),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -387,6 +333,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
 
     final sizeList = widget.data.sizes.isNotEmpty ? widget.data.sizes : standardSizes;
+    final wishlist = context.watch<WishlistProvider>();
+    final isWishlisted = wishlist.isFavorite(widget.data.title);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0D1117) : const Color(0xFFF8FAFC),
@@ -433,11 +381,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               ),
               const SizedBox(width: 8),
               _GlassIconButton(
-                icon: _isWishlisted ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                iconColor: _isWishlisted ? const Color(0xFFEF4444) : null,
+                icon: isWishlisted ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                iconColor: isWishlisted ? const Color(0xFFEF4444) : null,
                 onTap: () {
                   HapticFeedback.mediumImpact();
-                  setState(() => _isWishlisted = !_isWishlisted);
+                  wishlist.toggleFavorite(Product(
+                    title: widget.data.title,
+                    price: widget.data.price,
+                    rating: widget.data.rating,
+                    imageUrl: widget.data.images.isNotEmpty ? widget.data.images.first : '',
+                  ));
                 },
                 isDark: isDark,
               ),
@@ -618,7 +571,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     children: [
                       _microSectionLabel(context.tr('select_size').toUpperCase(), textSecondary),
                       GestureDetector(
-                        onTap: () => _showSizeGuideModal(context, isDark, cardBg, borderColor, textPrimary, textSecondary, primaryColor),
+                        onTap: () => SizingGuideSheet.show(context, productTitle: widget.data.title),
                         child: Row(
                           children: [
                             Icon(Icons.straighten_rounded, size: 14, color: primaryColor),
@@ -858,9 +811,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _microSectionLabel(context.tr('customer_reviews').toUpperCase(), textSecondary),
-                      Text(
-                        '${widget.data.rating} / 5.0 ★',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: primaryColor),
+                      GestureDetector(
+                        onTap: () {
+                          WriteReviewSheet.show(
+                            context,
+                            productTitle: widget.data.title,
+                            onReviewSubmitted: (rev) {
+                              setState(() => _dynamicReviews.insert(0, rev));
+                            },
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Icon(CupertinoIcons.square_pencil, size: 14, color: primaryColor),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Write Review',
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: primaryColor),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -868,8 +838,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
                   RatingSummaryWidget(
                     average: widget.data.rating,
-                    totalRatings: 2238,
-                    totalReviews: 941,
+                    totalRatings: 2238 + _dynamicReviews.length - widget.data.reviews.length,
+                    totalReviews: 941 + _dynamicReviews.length - widget.data.reviews.length,
                   ),
                   const SizedBox(height: 14),
                 ],
@@ -878,11 +848,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
 
           // Reviews List
-          if (widget.data.reviews.isNotEmpty)
+          if (_dynamicReviews.isNotEmpty)
             SliverList.separated(
-              itemCount: widget.data.reviews.length,
+              itemCount: _dynamicReviews.length,
               separatorBuilder: (_, _) => Divider(height: 1, color: borderColor),
-              itemBuilder: (_, i) => ReviewTileWidget(widget.data.reviews[i]),
+              itemBuilder: (_, i) => ReviewTileWidget(_dynamicReviews[i]),
             ),
 
           // "You May Also Like" Curated Recommendations
@@ -902,138 +872,194 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         ],
       ),
 
-      // Fixed Ultra-Clean Luxury Bottom Checkout Bar
+      // Fixed Modern Ultra-Luxury Bottom Checkout Bar
       bottomNavigationBar: SafeArea(
         top: false,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
           decoration: BoxDecoration(
             color: isDark
-                ? const Color(0xFF161B22).withValues(alpha: 0.96)
-                : Colors.white.withValues(alpha: 0.96),
-            border: Border(top: BorderSide(color: borderColor, width: 1)),
+                ? const Color(0xFF090D14).withValues(alpha: 0.90)
+                : Colors.white.withValues(alpha: 0.94),
+            border: Border(
+              top: BorderSide(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.06),
+                width: 1,
+              ),
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-                blurRadius: 16,
-                offset: const Offset(0, -4),
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, -6),
               ),
             ],
           ),
-          child: Row(
-            children: [
-              // Chat with Stylist Button
-              PressableScale(
-                onTap: _openChatWithSeller,
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E2633) : const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: borderColor, width: 1),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(CupertinoIcons.chat_bubble_2_fill, size: 20, color: primaryColor),
-                      Positioned(
-                        top: 9,
-                        right: 9,
-                        child: Container(
-                          width: 7,
-                          height: 7,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF10B981),
-                            shape: BoxShape.circle,
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: Row(
+                  children: [
+                    // Stylist Concierge Chat Button
+                    PressableScale(
+                      onTap: _openChatWithSeller,
+                      child: Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF161B22) : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.12)
+                                : const Color(0xFFE2E8F0),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Icon(
+                              CupertinoIcons.chat_bubble_2_fill,
+                              size: 22,
+                              color: primaryColor,
+                            ),
+                            Positioned(
+                              top: 11,
+                              right: 11,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF10B981),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF161B22) : Colors.white,
+                                    width: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // "Add to Bag" Wide Luxury Button
+                    Expanded(
+                      flex: 1,
+                      child: PressableScale(
+                        onTap: _addToBag,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 240),
+                          curve: Curves.easeOutCubic,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: _isAdded
+                                ? const Color(0xFF10B981).withValues(alpha: isDark ? 0.22 : 0.12)
+                                : primaryColor.withValues(alpha: isDark ? 0.12 : 0.08),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: _isAdded
+                                  ? const Color(0xFF10B981)
+                                  : primaryColor.withValues(alpha: isDark ? 0.35 : 0.25),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _isAdded
+                                    ? CupertinoIcons.checkmark_circle_fill
+                                    : CupertinoIcons.bag_fill,
+                                size: 18,
+                                color: _isAdded
+                                    ? const Color(0xFF10B981)
+                                    : primaryColor,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _isAdded ? 'Added' : context.tr('add_to_bag'),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.2,
+                                  color: _isAdded
+                                      ? const Color(0xFF10B981)
+                                      : primaryColor,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
+                    ),
+                    const SizedBox(width: 10),
 
-              // Price Breakdown
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    context.tr('total_price'),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: textSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    '\$${widget.data.price.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
-                      color: textPrimary,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 14),
-
-              // "Add to Bag" Primary CTA Button
-              Expanded(
-                child: PressableScale(
-                  onTap: _addToBag,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 240),
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: _isAdded ? const Color(0xFF10B981) : primaryColor,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: (_isAdded
-                                  ? const Color(0xFF10B981)
-                                  : primaryColor)
-                              .withValues(alpha: 0.35),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          child: Icon(
-                            _isAdded
-                                ? Icons.check_circle_rounded
-                                : CupertinoIcons.bag_fill,
-                            key: ValueKey<bool>(_isAdded),
-                            size: 17,
-                            color: Colors.white,
+                    // "Buy Now" Wide Glowing CTA Button
+                    Expanded(
+                      flex: 1,
+                      child: PressableScale(
+                        onTap: _handleBuyNow,
+                        child: Container(
+                          height: 52,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                primaryColor,
+                                primaryColor.withValues(alpha: 0.85),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: primaryColor.withValues(alpha: isDark ? 0.45 : 0.35),
+                                blurRadius: 14,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                CupertinoIcons.bolt_fill,
+                                size: 17,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Buy Now',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _isAdded
-                              ? context.tr('item_added_to_cart')
-                              : context.tr('add_to_bag'),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

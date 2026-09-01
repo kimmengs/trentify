@@ -18,6 +18,7 @@ import 'package:trentify/screens/more/address/address.dart';
 import 'package:trentify/screens/more/edit_profile_page.dart';
 import 'package:trentify/screens/more/language_page.dart';
 import 'package:trentify/screens/more/theme.dart';
+import 'package:trentify/screens/search/search_page.dart';
 import 'package:trentify/model/seller_product.dart';
 import 'package:trentify/screens/navigation/home_shell.dart';
 import 'package:trentify/screens/onboarding_page/onboarding_page.dart';
@@ -157,12 +158,6 @@ GoRouter createRouter({required String initialLocation}) {
         pageBuilder: (ctx, state) {
           final id = state.pathParameters['id']!;
           final data = DemoDb.productDetailById(id);
-          if (data == null) {
-            return _fadePage(
-              key: state.pageKey,
-              child: const Scaffold(body: Center(child: Text('Not found'))),
-            );
-          }
           return _slideUpPage(
             key: state.pageKey,
             child: ProductDetailPage(
@@ -178,6 +173,16 @@ GoRouter createRouter({required String initialLocation}) {
           key: state.pageKey,
           child: const NotificationPage(),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.search,
+        pageBuilder: (ctx, state) {
+          final q = state.uri.queryParameters['q'];
+          return _slideUpPage(
+            key: state.pageKey,
+            child: SearchPage(initialQuery: q),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.cart,
@@ -217,13 +222,15 @@ GoRouter createRouter({required String initialLocation}) {
         path: AppRoutes.addressPicker,
         pageBuilder: (ctx, state) {
           final payload = (state.extra as Map?) ?? {};
-          final addrs = (payload['addresses'] as List<Address>?) ?? const [];
+          final addrs = payload['addresses'] as List<Address>?;
           final selectedId = payload['selectedId'] as String?;
+          final isPickerMode = payload['isPickerMode'] as bool? ?? (payload.containsKey('selectedId'));
           return _slideRightPage(
             key: state.pageKey,
             child: AddressPickerPage(
               addresses: addrs,
               initialSelectedId: selectedId,
+              isPickerMode: isPickerMode,
             ),
           );
         },

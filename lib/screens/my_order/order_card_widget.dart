@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/order_status.dart';
 import 'package:trentify/model/order_summary.dart';
+import 'package:trentify/screens/home/widget/write_review_sheet.dart';
 import 'package:trentify/widgets/pressable_scale.dart';
 
 class OrderCardWidget extends StatelessWidget {
@@ -569,6 +570,37 @@ class OrderCardWidget extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                PressableScale(
+                  onTap: () {
+                    WriteReviewSheet.show(context, productTitle: hero.title);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B).withValues(alpha: isDark ? 0.18 : 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(CupertinoIcons.star_fill, size: 12, color: Color(0xFFF59E0B)),
+                        SizedBox(width: 5),
+                        Text(
+                          'Review',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFFF59E0B),
                           ),
                         ),
                       ],

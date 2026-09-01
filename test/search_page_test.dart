@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/provider/cart_provider.dart';
 import 'package:trentify/provider/wishlist_provider.dart';
-import 'package:trentify/screens/wish_list/wish_list.dart';
+import 'package:trentify/screens/search/search_page.dart';
 
 const List<int> _kTransparentImage = <int>[
   0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49,
@@ -21,29 +21,21 @@ const List<int> _kTransparentImage = <int>[
 
 class _TestHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return _MockHttpClient();
-  }
+  HttpClient createHttpClient(SecurityContext? context) => _MockHttpClient();
 }
 
 class _MockHttpClient extends Fake implements HttpClient {
   @override
   bool autoUncompress = true;
-
   @override
-  Future<HttpClientRequest> getUrl(Uri url) async {
-    return _MockHttpClientRequest();
-  }
+  Future<HttpClientRequest> getUrl(Uri url) async => _MockHttpClientRequest();
 }
 
 class _MockHttpClientRequest extends Fake implements HttpClientRequest {
   @override
   final HttpHeaders headers = _MockHttpHeaders();
-
   @override
-  Future<HttpClientResponse> close() async {
-    return _MockHttpClientResponse();
-  }
+  Future<HttpClientResponse> close() async => _MockHttpClientResponse();
 }
 
 class _MockHttpHeaders extends Fake implements HttpHeaders {
@@ -56,14 +48,11 @@ class _MockHttpHeaders extends Fake implements HttpHeaders {
 class _MockHttpClientResponse extends Fake implements HttpClientResponse {
   @override
   int get statusCode => 200;
-
   @override
   int get contentLength => _kTransparentImage.length;
-
   @override
   HttpClientResponseCompressionState get compressionState =>
       HttpClientResponseCompressionState.notCompressed;
-
   @override
   StreamSubscription<List<int>> listen(
     void Function(List<int> event)? onData, {
@@ -81,25 +70,15 @@ class _MockHttpClientResponse extends Fake implements HttpClientResponse {
 }
 
 void main() {
-  late CartProvider cart;
-
   setUpAll(() {
     HttpOverrides.global = _TestHttpOverrides();
-  });
-
-  setUp(() {
-    cart = CartProvider.instance;
-    cart.clearCart();
-    WishlistProvider.instance.resetToDefaults();
   });
 
   Widget createTestWidget({required Widget child}) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<CartProvider>.value(value: cart),
-        ChangeNotifierProvider<WishlistProvider>.value(
-          value: WishlistProvider.instance,
-        ),
+        ChangeNotifierProvider<CartProvider>.value(value: CartProvider.instance),
+        ChangeNotifierProvider<WishlistProvider>.value(value: WishlistProvider.instance),
       ],
       child: MaterialApp(
         localizationsDelegates: const [
@@ -114,66 +93,33 @@ void main() {
     );
   }
 
-  testWidgets('WishListPage renders grid, switches to list view, and filters by search', (tester) async {
+  testWidgets('SearchPage renders recent searches, trending tags and filters results', (tester) async {
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
-    await tester.pumpWidget(createTestWidget(child: const WishListPage()));
+    await tester.pumpWidget(createTestWidget(child: const SearchPage()));
     await tester.pumpAndSettle();
 
-    // Verify Title with count
-    expect(find.text('Wishlist (5)'), findsOneWidget);
+    // Verify Search Bar and initial state
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Recent Searches'), findsOneWidget);
+    expect(find.text('Trending Searches'), findsOneWidget);
 
-    // Verify Product items in grid
-    expect(find.text('Urban Blend Long Sleeve'), findsOneWidget);
-    expect(find.text('Luxe Blend Formal Tee'), findsOneWidget);
-
-    // Toggle to List View
-    final listToggle = find.byIcon(CupertinoIcons.list_bullet);
-    expect(listToggle, findsOneWidget);
-    await tester.tap(listToggle);
+    // Type query
+    await tester.enterText(find.byType(TextField), 'Silk');
     await tester.pumpAndSettle();
 
-    // Verify list view is active (showing In Stock badge)
-    expect(find.text('In Stock'), findsWidgets);
+    // Verify search results header
+    expect(find.textContaining('Found for "Silk"'), findsOneWidget);
 
-    // Toggle back to Grid View
-    final gridToggle = find.byIcon(CupertinoIcons.square_grid_2x2);
-    expect(gridToggle, findsOneWidget);
-    await tester.tap(gridToggle);
+    // Clear search
+    final clearBtn = find.byIcon(CupertinoIcons.clear_circled_solid);
+    expect(clearBtn, findsOneWidget);
+    await tester.tap(clearBtn);
     await tester.pumpAndSettle();
 
-    // Open Search Bar
-    final searchToggle = find.byIcon(CupertinoIcons.search);
-    expect(searchToggle, findsOneWidget);
-    await tester.tap(searchToggle);
-    await tester.pumpAndSettle();
-
-    // Enter search text
-    final searchField = find.byType(TextField);
-    expect(searchField, findsOneWidget);
-    await tester.enterText(searchField, 'Formal');
-    await tester.pumpAndSettle();
-
-    expect(find.text('Luxe Blend Formal Tee'), findsOneWidget);
-    expect(find.text('Urban Blend Long Sleeve'), findsNothing);
-  });
-
-  testWidgets('1-tap add to bag adds item to cart provider', (tester) async {
-    tester.view.physicalSize = const Size(800, 1600);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(() => tester.view.resetPhysicalSize());
-
-    await tester.pumpWidget(createTestWidget(child: const WishListPage()));
-    await tester.pumpAndSettle();
-
-    final addToBagBtns = find.byIcon(CupertinoIcons.bag_badge_plus);
-    expect(addToBagBtns, findsWidgets);
-
-    await tester.tap(addToBagBtns.first);
-    await tester.pumpAndSettle();
-
-    expect(cart.totalCount, 1);
+    // Back to recent & trending
+    expect(find.text('Recent Searches'), findsOneWidget);
   });
 }

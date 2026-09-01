@@ -8,6 +8,7 @@ import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/filter_result.dart';
 import 'package:trentify/provider/cart_provider.dart';
 import 'package:trentify/provider/seller_provider.dart';
+import 'package:trentify/provider/wishlist_provider.dart';
 import 'package:trentify/screens/home/product_detail.dart';
 
 final List<int> _kTransparentImage = <int>[
@@ -98,7 +99,7 @@ void main() {
   late CartProvider cart;
 
   setUp(() {
-    cart = CartProvider();
+    cart = CartProvider.instance;
     cart.clearCart();
 
     sampleProduct = const ProductDetailData(
@@ -124,6 +125,7 @@ void main() {
       providers: [
         ChangeNotifierProvider<CartProvider>.value(value: cart),
         ChangeNotifierProvider<SellerProvider>.value(value: SellerProvider.instance),
+        ChangeNotifierProvider<WishlistProvider>.value(value: WishlistProvider.instance),
       ],
       child: MaterialApp(
         supportedLocales: AppLocalizations.supportedLocales,

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/l10n/locale_controller.dart';
+import 'package:trentify/provider/address_provider.dart';
 import 'package:trentify/provider/cart_provider.dart';
 import 'package:trentify/screens/more/more_page.dart';
 import 'package:trentify/theme/theme_controller.dart';
@@ -101,6 +102,7 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
+          ChangeNotifierProvider<AddressProvider>.value(value: AddressProvider.instance),
           ChangeNotifierProvider<CartProvider>.value(value: CartProvider.instance),
           ChangeNotifierProvider<LocaleController>.value(value: localeCtl),
           ChangeNotifierProvider<ThemeController>.value(value: themeCtl),
@@ -128,6 +130,7 @@ void main() {
     expect(find.text('Shop Owner Center'), findsOneWidget);
 
     // Verify Settings items
+    expect(find.text('Shipping & Delivery Addresses'), findsOneWidget);
     expect(find.text('Theme & Appearance'), findsOneWidget);
     expect(find.text('Language & Region'), findsOneWidget);
     expect(find.text('Notifications'), findsOneWidget);

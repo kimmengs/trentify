@@ -31,14 +31,14 @@ class FilterResult {
   }
 
   static const defaultMin = 1.0;
-  static const defaultMax = 300.0;
+  static const defaultMax = 1000.0;
 
   static FilterResult initial() => const FilterResult(
-    categories: {"Men"},
-    priceRange: RangeValues(85, 220),
+    categories: {},
+    priceRange: RangeValues(defaultMin, defaultMax),
     ratingAtLeast: null,
-    sizes: {"L", "38"},
-    colorName: "Black",
+    sizes: {},
+    colorName: null,
   );
 
   static FilterResult cleared() => const FilterResult(

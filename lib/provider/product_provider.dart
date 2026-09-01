@@ -16,8 +16,6 @@ class InMemoryProductRepository implements ProductRepository {
   @override
   Future<ProductDetailData> fetchProductDetail(String id) async {
     await Future.delayed(simulatedLatency);
-    final data = DemoDb.productDetailById(id);
-    if (data == null) throw Exception('Product not found: $id');
-    return data;
+    return DemoDb.productDetailById(id);
   }
 }

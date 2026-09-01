@@ -14,6 +14,10 @@ import 'package:trentify/provider/product_provider.dart';
 import 'router/app_router.dart';
 import 'router/app_routes.dart';
 
+import 'package:trentify/provider/address_provider.dart';
+import 'package:trentify/provider/order_provider.dart';
+import 'package:trentify/provider/wishlist_provider.dart';
+
 // THEME pieces
 import 'theme/theme_controller.dart'; // <- provides AppThemeMode, ThemeController
 import 'theme/app_theme.dart'; // <- buildMaterialTheme()
@@ -45,8 +49,17 @@ Future<void> main() async {
         ChangeNotifierProvider<LocaleController>(
           create: (_) => LocaleController(prefs),
         ),
+        ChangeNotifierProvider<AddressProvider>(
+          create: (_) => AddressProvider.instance,
+        ),
         ChangeNotifierProvider<CartProvider>(
           create: (_) => CartProvider.instance,
+        ),
+        ChangeNotifierProvider<WishlistProvider>(
+          create: (_) => WishlistProvider.instance,
+        ),
+        ChangeNotifierProvider<OrderProvider>(
+          create: (_) => OrderProvider.instance,
         ),
         Provider<ProductRepository>(create: (_) => InMemoryProductRepository()),
       ],
@@ -62,7 +75,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = createRouter(
-      initialLocation: showOnboarding ? AppRoutes.onboarding : AppRoutes.signIn,
+      initialLocation: showOnboarding ? AppRoutes.onboarding : AppRoutes.home,
     );
 
     // Watch theme and locale state

@@ -2,11 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trentify/router/app_routes.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/demodb.dart';
 import 'package:trentify/screens/home/widget/category_pill_widget.dart';
 import 'package:trentify/screens/home/widget/horizontal_products.dart';
+import 'package:trentify/screens/home/widget/product_card_widget.dart';
 import 'package:trentify/screens/home/widget/search_fill_widget.dart';
+import 'package:trentify/widgets/animated_entry.dart';
 import 'package:trentify/widgets/pressable_scale.dart';
 import 'package:trentify/widgets/section_header_widget.dart';
 
@@ -154,7 +157,11 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
                 child: SearchFieldWidget(
                   placeholder: context.tr('search_placeholder'),
-                  onChanged: (v) {},
+                  readOnly: true,
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    context.push(AppRoutes.search);
+                  },
                 ),
               ),
             ),
@@ -185,85 +192,184 @@ class _TrendifyHomeCupertinoState extends State<TrendifyHomeCupertino> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
-            // Top Picks Row
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 6),
-                child: SectionHeader(
-                  title: context.tr('top_picks'),
-                  onAction: () {},
+            if (_selectedTab == 0) ...[
+              // Top Picks Row
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 6),
+                  child: SectionHeader(
+                    title: context.tr('top_picks'),
+                    onAction: () => context.pushNamed('category', pathParameters: {'name': 'Top Picks'}),
+                  ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: HorizontalProducts(products: DemoDb.topPicks),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: HorizontalProducts(products: DemoDb.topPicks),
+                ),
               ),
-            ),
 
-            // Categories Grid Section
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
-                child: const SectionHeader(
-                  title: 'Shop by Category',
-                  variant: SectionHeaderVariant.materialAction,
+              // Categories Grid Section
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
+                  child: const SectionHeader(
+                    title: 'Shop by Category',
+                    variant: SectionHeaderVariant.materialAction,
+                  ),
                 ),
               ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final c = DemoDb.categories[index];
-                  return _CategoryTile(
-                    title: c.title,
-                    imagePathOrUrl: c.imagePath,
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                sliver: SliverGrid(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final c = DemoDb.categories[index];
+                    return _CategoryTile(
+                      title: c.title,
+                      imagePathOrUrl: c.imagePath,
+                    );
+                  }, childCount: DemoDb.categories.length),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 2.1,
+                  ),
+                ),
+              ),
+
+              // New Arrival Section
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+                  child: SectionHeader(
+                    title: context.tr('new_arrivals'),
+                    onAction: () => context.pushNamed('category', pathParameters: {'name': 'New Arrivals'}),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: HorizontalProducts(products: DemoDb.newArrivals),
+                ),
+              ),
+
+              // Hot Deals Section
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+                  child: SectionHeader(
+                    title: context.tr('hot_deals'),
+                    onAction: () => context.pushNamed('category', pathParameters: {'name': 'Hot Deals'}),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: HorizontalProducts(products: DemoDb.hotDeals),
+                ),
+              ),
+            ] else ...[
+              // Filtered Category Header
+              Builder(
+                builder: (context) {
+                  final categoryKeys = ['All', 'Women', 'Men', 'Shoe', 'Bag', 'Luxury', 'Kids'];
+                  final currentCategoryKey = _selectedTab < categoryKeys.length ? categoryKeys[_selectedTab] : 'All';
+                  final categoryProducts = DemoDb.getProductsByCategory(currentCategoryKey);
+
+                  return SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${tabs[_selectedTab]} Collection',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: textPrimary,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${categoryProducts.length} Curated Luxury Pieces',
+                                style: TextStyle(fontSize: 12, color: textSecondary),
+                              ),
+                            ],
+                          ),
+                          PressableScale(
+                            onTap: () {
+                              context.pushNamed('category', pathParameters: {'name': currentCategoryKey});
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withValues(alpha: isDark ? 0.2 : 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Sort & Filter',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: primaryColor,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(CupertinoIcons.slider_horizontal_3, size: 12, color: primaryColor),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
-                }, childCount: DemoDb.categories.length),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 2.1,
-                ),
+                },
               ),
-            ),
 
-            // New Arrival Section
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-                child: SectionHeader(
-                  title: context.tr('new_arrivals'),
-                  onAction: () {},
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: HorizontalProducts(products: DemoDb.newArrivals),
-              ),
-            ),
+              // Filtered Category Grid
+              Builder(
+                builder: (context) {
+                  final categoryKeys = ['All', 'Women', 'Men', 'Shoe', 'Bag', 'Luxury', 'Kids'];
+                  final currentCategoryKey = _selectedTab < categoryKeys.length ? categoryKeys[_selectedTab] : 'All';
+                  final categoryProducts = DemoDb.getProductsByCategory(currentCategoryKey);
 
-            // Hot Deals Section
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-                child: SectionHeader(
-                  title: context.tr('hot_deals'),
-                  onAction: () {},
-                ),
+                  return SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: SliverGrid(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final product = categoryProducts[index];
+                          return AnimatedEntry(
+                            delay: Duration(milliseconds: 40 * (index % 8)),
+                            child: ProductCardWidget(product: product),
+                          );
+                        },
+                        childCount: categoryProducts.length,
+                      ),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 14,
+                        childAspectRatio: 0.66,
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: HorizontalProducts(products: DemoDb.hotDeals),
-              ),
-            ),
+            ],
 
             const SliverToBoxAdapter(child: SizedBox(height: 120)),
           ],

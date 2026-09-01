@@ -7,6 +7,7 @@ class AppRoutes {
   static const productDetail = '/product/detail/:id';
   static const productChat = '/product/chat';
   static const notification = '/notification';
+  static const search = '/search';
   static const cart = '/cart';
   static const checkout = '/checkout';
   static const addressPicker = '/address-picker';

@@ -4,12 +4,16 @@ class SearchFieldWidget extends StatelessWidget {
   final String placeholder;
   final ValueChanged<String>? onChanged;
   final TextEditingController? controller;
+  final VoidCallback? onTap;
+  final bool readOnly;
 
   const SearchFieldWidget({
     super.key,
     required this.placeholder,
     this.onChanged,
     this.controller,
+    this.onTap,
+    this.readOnly = false,
   });
 
   @override
@@ -52,6 +56,8 @@ class SearchFieldWidget extends StatelessWidget {
               placeholder: placeholder,
               placeholderStyle: TextStyle(color: textColor),
               onChanged: onChanged,
+              onTap: onTap,
+              readOnly: readOnly,
               padding: const EdgeInsets.symmetric(vertical: 14),
               clearButtonMode: OverlayVisibilityMode.editing,
             ),

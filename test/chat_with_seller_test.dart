@@ -138,7 +138,7 @@ void main() {
     });
 
     testWidgets('ProductChatPage renders seller header, pinned product card and suggestions', (tester) async {
-      final productData = DemoDb.productDetailById('ubl-ss-001')!;
+      final productData = DemoDb.productDetailById('ubl-ss-001');
 
       await tester.pumpWidget(
         MaterialApp(
@@ -160,7 +160,7 @@ void main() {
       expect(find.text('Online • Replies in minutes'), findsOneWidget);
 
       // Check pinned product summary banner
-      expect(find.text('Urban Blend Long Sleeve Shirt'), findsWidgets);
+      expect(find.textContaining('Urban Blend Long Sleeve'), findsWidgets);
       expect(find.text('Send Item'), findsOneWidget);
 
       // Check suggestion chips

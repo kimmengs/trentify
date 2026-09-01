@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:trentify/l10n/app_localizations.dart';
-import 'package:trentify/model/order_product.dart';
 import 'package:trentify/model/order_status.dart';
 import 'package:trentify/model/order_summary.dart';
+import 'package:trentify/provider/order_provider.dart';
 import 'package:trentify/screens/my_order/cancel_sheets.dart';
 import 'package:trentify/screens/my_order/order_list_widget.dart';
 import 'package:trentify/screens/my_order/segment_tab_widget.dart';
@@ -19,7 +20,6 @@ class MyOrderPage extends StatefulWidget {
 class _MyOrderPageState extends State<MyOrderPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
-  late List<OrderSummary> _orders;
   final TextEditingController _searchCtl = TextEditingController();
   String _searchQuery = '';
   bool _isSearchVisible = false;
@@ -28,69 +28,6 @@ class _MyOrderPageState extends State<MyOrderPage>
   void initState() {
     super.initState();
     _tab = TabController(length: 3, vsync: this);
-
-    _orders = [
-      OrderSummary(
-        id: 'ORD-1001',
-        createdAt: DateTime.now(),
-        products: const [
-          OrderProduct(
-            'Urban Blend Long Sleeve Silk Shirt',
-            'https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop',
-          ),
-          OrderProduct(
-            'Tailored Slim Fit Denim Jeans',
-            'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop',
-          ),
-          OrderProduct(
-            'Italian Leather Luxury Belt',
-            'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop',
-          ),
-        ],
-        total: 441.50,
-        status: OrderStatus.active,
-      ),
-      OrderSummary(
-        id: 'ORD-1000',
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        products: const [
-          OrderProduct(
-            'Urban Elegance Wool Business Blazer',
-            'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop',
-          ),
-        ],
-        total: 184.50,
-        status: OrderStatus.active,
-      ),
-      OrderSummary(
-        id: 'ORD-0999',
-        createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        products: const [
-          OrderProduct(
-            'Oversized Heavyweight Cotton Hoodie',
-            'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=800&auto=format&fit=crop',
-          ),
-          OrderProduct(
-            'Minimalist Premium Crewneck Tee',
-            'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop',
-          ),
-        ],
-        total: 120.00,
-        status: OrderStatus.completed,
-      ),
-      OrderSummary(
-        id: 'ORD-0998',
-        createdAt: DateTime.now().subtract(const Duration(days: 7)),
-        products: const [
-          OrderProduct(
-            'Modal Silk Fine Knit Sweater',
-            'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=800&auto=format&fit=crop',
-          ),
-        ],
-        total: 90.00,
-        status: OrderStatus.canceled,
-      ),
-    ];
   }
 
   @override
@@ -113,18 +50,7 @@ class _MyOrderPageState extends State<MyOrderPage>
     );
 
     if (confirmed == true && mounted) {
-      setState(() {
-        final index = _orders.indexWhere((o) => o.id == order.id);
-        if (index != -1) {
-          _orders[index] = OrderSummary(
-            id: order.id,
-            createdAt: order.createdAt,
-            products: order.products,
-            total: order.total,
-            status: OrderStatus.canceled,
-          );
-        }
-      });
+      context.read<OrderProvider>().cancelOrder(order.id);
 
       await showModalBottomSheet<void>(
         context: context,
@@ -134,15 +60,14 @@ class _MyOrderPageState extends State<MyOrderPage>
     }
   }
 
-  List<OrderSummary> _filterOrders(OrderStatus status) {
-    return _orders.where((o) {
+  List<OrderSummary> _filterOrders(List<OrderSummary> allOrders, OrderStatus status) {
+    return allOrders.where((o) {
       final matchesStatus = o.status == status;
       if (!matchesStatus) return false;
       if (_searchQuery.trim().isEmpty) return true;
       final q = _searchQuery.toLowerCase();
-      final matchesId = o.id.toLowerCase().contains(q);
-      final matchesProduct = o.products.any((p) => p.title.toLowerCase().contains(q));
-      return matchesId || matchesProduct;
+      return o.id.toLowerCase().contains(q) ||
+          o.products.any((p) => p.title.toLowerCase().contains(q));
     }).toList();
   }
 
@@ -155,9 +80,11 @@ class _MyOrderPageState extends State<MyOrderPage>
     final cardBg = isDark ? const Color(0xFF161B22) : Colors.white;
     final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
 
-    final activeCount = _orders.where((o) => o.status == OrderStatus.active).length;
-    final completedCount = _orders.where((o) => o.status == OrderStatus.completed).length;
-    final canceledCount = _orders.where((o) => o.status == OrderStatus.canceled).length;
+    final orderProv = context.watch<OrderProvider>();
+    final allOrders = orderProv.orders;
+    final activeCount = orderProv.activeCount;
+    final completedCount = orderProv.completedCount;
+    final canceledCount = orderProv.canceledCount;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF090D14) : const Color(0xFFF8FAFC),
@@ -271,15 +198,15 @@ class _MyOrderPageState extends State<MyOrderPage>
               physics: const BouncingScrollPhysics(),
               children: [
                 OrderListWidget(
-                  orders: _filterOrders(OrderStatus.active),
+                  orders: _filterOrders(allOrders, OrderStatus.active),
                   onRequestCancel: _requestCancel,
                 ),
                 OrderListWidget(
-                  orders: _filterOrders(OrderStatus.completed),
+                  orders: _filterOrders(allOrders, OrderStatus.completed),
                   onRequestCancel: _requestCancel,
                 ),
                 OrderListWidget(
-                  orders: _filterOrders(OrderStatus.canceled),
+                  orders: _filterOrders(allOrders, OrderStatus.canceled),
                   onRequestCancel: _requestCancel,
                 ),
               ],
