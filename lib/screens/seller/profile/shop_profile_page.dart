@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/provider/seller_provider.dart';
 import 'package:trentify/router/app_routes.dart';
@@ -107,6 +109,15 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
     }
   }
 
+  String _formatMoney(double amount) {
+    try {
+      final ctl = context.watch<CurrencyController>();
+      return ctl.format(amount);
+    } catch (_) {
+      return '\$${amount.toStringAsFixed(2)}';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -116,6 +127,12 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
     final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
 
     final profile = _seller.profile;
 
@@ -328,8 +345,19 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
                     icon: CupertinoIcons.money_dollar_circle_fill,
                     iconColor: const Color(0xFF10B981),
                     title: context.tr('payouts_settlements'),
-                    subtitle: 'Available balance: \$${_seller.availableBalance.toStringAsFixed(2)}',
+                    subtitle: 'Available balance: ${_formatMoney(_seller.availableBalance)}',
                     onTap: () => context.push(AppRoutes.sellerPayouts),
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
+                    isDark: isDark,
+                    showDivider: true,
+                  ),
+                  _menuNavTile(
+                    icon: CupertinoIcons.money_dollar_circle,
+                    iconColor: const Color(0xFF059669),
+                    title: context.tr('display_currency'),
+                    subtitle: currencyCtl?.displayName ?? 'USD (\$) • US Dollar',
+                    onTap: () => context.push(AppRoutes.currency),
                     textPrimary: textPrimary,
                     textSecondary: textSecondary,
                     isDark: isDark,
@@ -642,7 +670,7 @@ class _ShopProfilePageState extends State<ShopProfilePage> {
                         style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: textSecondary),
                       ),
                       Text(
-                        '\$${_seller.availableBalance.toStringAsFixed(2)}',
+                        _formatMoney(_seller.availableBalance),
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF10B981)),
                       ),
                     ],

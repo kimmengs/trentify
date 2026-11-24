@@ -17,6 +17,7 @@ class AppRoutes {
   static const myOrders = '/my-orders';
   static const theme = '/settings/theme';
   static const language = '/settings/language';
+  static const currency = '/settings/currency';
   static const editProfile = '/profile/edit';
 
   // Seller & Shop Owner Routes

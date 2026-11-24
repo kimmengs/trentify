@@ -15,6 +15,7 @@ import 'package:trentify/screens/home/notification/notification.dart';
 import 'package:trentify/screens/home/product_detail.dart';
 import 'package:trentify/screens/chat/product_chat_page.dart';
 import 'package:trentify/screens/more/address/address.dart';
+import 'package:trentify/screens/more/currency_page.dart';
 import 'package:trentify/screens/more/edit_profile_page.dart';
 import 'package:trentify/screens/more/language_page.dart';
 import 'package:trentify/screens/more/theme.dart';
@@ -289,6 +290,13 @@ GoRouter createRouter({required String initialLocation}) {
         pageBuilder: (ctx, state) => _slideRightPage(
           key: state.pageKey,
           child: const LanguageSettingsPage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.currency,
+        pageBuilder: (ctx, state) => _slideRightPage(
+          key: state.pageKey,
+          child: const CurrencySettingsPage(),
         ),
       ),
       GoRoute(

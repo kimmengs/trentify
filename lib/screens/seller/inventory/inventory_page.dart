@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/seller_product.dart';
 import 'package:trentify/provider/seller_provider.dart';
@@ -284,6 +286,13 @@ class _InventoryRowCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLow = product.isLowStock;
     final isOut = product.isOutOfStock;
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
+    final formattedPrice = currencyCtl?.format(product.price) ?? '\$${product.price.toStringAsFixed(2)}';
 
     final badgeColor = isOut
         ? const Color(0xFFEF4444)
@@ -350,7 +359,7 @@ class _InventoryRowCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Sizes: ${product.sizes.join(", ")} • \$${product.price.toStringAsFixed(2)}',
+                  'Sizes: ${product.sizes.join(", ")} • $formattedPrice',
                   style: TextStyle(fontSize: 12, color: textSecondary),
                 ),
               ],

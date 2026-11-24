@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/seller_order.dart';
 import 'package:trentify/provider/seller_provider.dart';
@@ -371,7 +373,13 @@ class _SellerOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currency = NumberFormat.currency(symbol: '\$');
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
+    String formatMoney(double amount) => currencyCtl?.format(amount) ?? '\$${amount.toStringAsFixed(2)}';
     final dateFormat = DateFormat('MMM dd, yyyy · hh:mm a');
 
     final statusColor = switch (order.status) {
@@ -540,7 +548,7 @@ class _SellerOrderCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    currency.format(item.totalPrice),
+                    formatMoney(item.totalPrice),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -565,7 +573,7 @@ class _SellerOrderCard extends StatelessWidget {
                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textSecondary),
               ),
               Text(
-                currency.format(order.total),
+                formatMoney(order.total),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,

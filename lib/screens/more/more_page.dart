@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:trentify/currency/app_currency.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/l10n/locale_controller.dart';
 import 'package:trentify/provider/address_provider.dart';
@@ -105,6 +107,94 @@ class MorePage extends StatelessWidget {
     );
   }
 
+  void _showCurrencyPickerModal(BuildContext context) {
+    AppHaptics.light();
+    final currencyCtl = context.read<CurrencyController>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF161B22).withValues(alpha: 0.92)
+                    : Colors.white.withValues(alpha: 0.92),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.12)
+                      : Colors.white.withValues(alpha: 0.8),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF30363D) : const Color(0xFFCBD5E1),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    context.tr('select_currency'),
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _CurrencyOptionTile(
+                    flag: '🇺🇸',
+                    title: 'USD (\$) - US Dollar',
+                    subtitle: '1 USD = \$1.00 • Base Currency',
+                    selected: currencyCtl.currency == AppCurrency.usd,
+                    onTap: () {
+                      currencyCtl.setCurrency(AppCurrency.usd);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _CurrencyOptionTile(
+                    flag: '🇰🇭',
+                    title: 'KHR (៛) - Cambodian Riel',
+                    subtitle: '1 USD ≈ 4,100 ៛ • Cambodia',
+                    selected: currencyCtl.currency == AppCurrency.khr,
+                    onTap: () {
+                      currencyCtl.setCurrency(AppCurrency.khr);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _CurrencyOptionTile(
+                    flag: '🇻🇳',
+                    title: 'VND (₫) - Vietnamese Dong',
+                    subtitle: '1 USD ≈ 25,400 ₫ • Vietnam',
+                    selected: currencyCtl.currency == AppCurrency.vnd,
+                    onTap: () {
+                      currencyCtl.setCurrency(AppCurrency.vnd);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -114,6 +204,12 @@ class MorePage extends StatelessWidget {
     final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
 
     final localeCtl = context.watch<LocaleController>();
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
     final themeCtl = context.watch<ThemeController>();
     final cart = context.watch<CartProvider>();
     final addressProvider = context.watch<AddressProvider>();
@@ -430,7 +526,7 @@ class MorePage extends StatelessWidget {
                       icon: CupertinoIcons.star_circle_fill,
                       gradientColors: const [Color(0xFFF59E0B), Color(0xFFD97706)],
                       title: 'VIP Rewards & Loyalty Points',
-                      subtitle: '2,450 pts (≈ \$24.50 Available)',
+                      subtitle: '2,450 pts (≈ ${currencyCtl?.format(24.50) ?? "\$24.50"} Available)',
                       onTap: () => VipRewardsSheet.show(context),
                       textPrimary: textPrimary,
                       textSecondary: textSecondary,
@@ -461,6 +557,16 @@ class MorePage extends StatelessWidget {
                       title: context.tr('language_region'),
                       subtitle: localeCtl.displayName,
                       onTap: () => _showLanguagePickerModal(context),
+                      textPrimary: textPrimary,
+                      textSecondary: textSecondary,
+                    ),
+                    _GlassDivider(isDark: isDark),
+                    _LiquidSettingsTile(
+                      icon: CupertinoIcons.money_dollar_circle_fill,
+                      gradientColors: const [Color(0xFF059669), Color(0xFF10B981)],
+                      title: context.tr('display_currency'),
+                      subtitle: currencyCtl?.displayName ?? 'USD (\$) • US Dollar',
+                      onTap: () => _showCurrencyPickerModal(context),
                       textPrimary: textPrimary,
                       textSecondary: textSecondary,
                     ),
@@ -775,6 +881,93 @@ class _LanguageOptionTile extends StatelessWidget {
                       ? (isDark ? Colors.white : primaryColor)
                       : (isDark ? Colors.white : const Color(0xFF0F172A)),
                 ),
+              ),
+            ),
+            if (selected)
+              Icon(
+                CupertinoIcons.checkmark_seal_fill,
+                color: primaryColor,
+                size: 18,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CurrencyOptionTile extends StatelessWidget {
+  final String flag;
+  final String title;
+  final String subtitle;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _CurrencyOptionTile({
+    required this.flag,
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = Theme.of(context).primaryColor;
+    return GestureDetector(
+      onTap: () {
+        AppHaptics.selection();
+        onTap();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: selected
+              ? primaryColor.withValues(alpha: isDark ? 0.22 : 0.12)
+              : (isDark ? const Color(0xFF21262D) : const Color(0xFFF1F5F9)),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? primaryColor : (isDark ? const Color(0xFF30363D) : Colors.transparent),
+            width: selected ? 1.8 : 1,
+          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: primaryColor.withValues(alpha: isDark ? 0.35 : 0.20),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Text(flag, style: const TextStyle(fontSize: 22)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                      color: selected
+                          ? (isDark ? Colors.white : primaryColor)
+                          : (isDark ? Colors.white : const Color(0xFF0F172A)),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B),
+                    ),
+                  ),
+                ],
               ),
             ),
             if (selected)

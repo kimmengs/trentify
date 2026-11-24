@@ -21,6 +21,7 @@ import 'package:trentify/screens/home/widget/rating_summary_widget.dart';
 import 'package:trentify/screens/home/widget/review_tile_widget.dart';
 import 'package:trentify/screens/home/widget/sizing_guide_sheet.dart';
 import 'package:trentify/screens/home/widget/write_review_sheet.dart';
+import 'package:trentify/widgets/app_price_text.dart';
 import 'package:trentify/widgets/pressable_scale.dart';
 
 final colorDots = const <String, Color>{
@@ -462,14 +463,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        '\$${widget.data.price.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.4,
-                          color: primaryColor,
-                        ),
+                      AppPriceText(
+                        price: widget.data.price,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: primaryColor,
                       ),
                       const SizedBox(width: 12),
                       Container(

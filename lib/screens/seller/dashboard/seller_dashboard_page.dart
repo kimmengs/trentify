@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/seller_order.dart';
 import 'package:trentify/provider/seller_provider.dart';
@@ -46,7 +47,14 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
     final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
-    final currency = NumberFormat.currency(symbol: '\$');
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
+    String formatMoney(double amount) =>
+        currencyCtl?.format(amount) ?? '\$${amount.toStringAsFixed(2)}';
 
     final profile = _seller.profile;
     final pendingOrders = _seller.orders
@@ -239,7 +247,7 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      currency.format(_seller.totalRevenue),
+                      formatMoney(_seller.totalRevenue),
                       style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
@@ -256,7 +264,7 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
                       ),
                       child: Row(
                         children: [
-                          Expanded(child: _heroStat(context.tr('today_sales'), '\$1,240.50')),
+                          Expanded(child: _heroStat(context.tr('today_sales'), formatMoney(_seller.todayRevenue))),
                           Container(width: 1, height: 24, color: Colors.white.withValues(alpha: 0.2)),
                           Expanded(child: _heroStat(context.tr('items_sold'), '${profile.totalSales}')),
                           Container(width: 1, height: 24, color: Colors.white.withValues(alpha: 0.2)),
@@ -329,7 +337,7 @@ class _SellerDashboardPageState extends State<SellerDashboardPage> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '\$${_seller.availableBalance.toStringAsFixed(2)}',
+                            formatMoney(_seller.availableBalance),
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: textPrimary, letterSpacing: -0.3),
                           ),
                         ],
@@ -772,7 +780,13 @@ class _PendingOrderTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currency = NumberFormat.currency(symbol: '\$');
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
+    final formattedTotal = currencyCtl?.format(order.total) ?? '\$${order.total.toStringAsFixed(2)}';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -814,7 +828,7 @@ class _PendingOrderTile extends StatelessWidget {
                 ),
               ),
               Text(
-                currency.format(order.total),
+                formattedTotal,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
@@ -892,6 +906,14 @@ class _TopProductTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
+    final formattedPrice = currencyCtl?.format(product.price) ?? '\$${product.price.toStringAsFixed(2)}';
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -926,17 +948,18 @@ class _TopProductTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 3),
-                Row(
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 6,
                   children: [
                     Text(
-                      '\$${product.price.toStringAsFixed(2)}',
+                      formattedPrice,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: primaryColor,
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Text(
                       '• ${product.salesCount} sold',
                       style: TextStyle(fontSize: 12, color: textSecondary),

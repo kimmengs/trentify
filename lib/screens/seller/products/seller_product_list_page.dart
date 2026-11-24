@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/seller_product.dart';
 import 'package:trentify/provider/seller_provider.dart';
@@ -259,6 +261,13 @@ class _ProductItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isActive = product.status == SellerProductStatus.active;
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
+    final formattedPrice = currencyCtl?.format(product.price) ?? '\$${product.price.toStringAsFixed(2)}';
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -356,7 +365,7 @@ class _ProductItemCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '\$${product.price.toStringAsFixed(2)}',
+                          formattedPrice,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w800,

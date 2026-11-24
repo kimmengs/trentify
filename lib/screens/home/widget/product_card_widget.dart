@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/model/product.dart';
 import 'package:trentify/provider/wishlist_provider.dart';
 import 'package:trentify/screens/home/widget/build_product_image_widget.dart';
@@ -25,6 +26,13 @@ class ProductCardWidget extends StatelessWidget {
     final cardBg = isDark ? const Color(0xFF161B22) : Colors.white;
     final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    CurrencyController? currencyCtl;
+    try {
+      currencyCtl = context.watch<CurrencyController>();
+    } catch (_) {
+      currencyCtl = null;
+    }
+    final formattedPrice = currencyCtl?.format(product.price) ?? '\$${product.price.toStringAsFixed(2)}';
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -121,7 +129,7 @@ class ProductCardWidget extends StatelessWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              '\$${product.price.toStringAsFixed(2)}',
+                              formattedPrice,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(

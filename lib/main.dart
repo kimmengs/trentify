@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/l10n/locale_controller.dart';
 import 'package:trentify/provider/cart_provider.dart';
@@ -48,6 +49,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<LocaleController>(
           create: (_) => LocaleController(prefs),
+        ),
+        ChangeNotifierProvider<CurrencyController>(
+          create: (_) => CurrencyController(prefs),
         ),
         ChangeNotifierProvider<AddressProvider>(
           create: (_) => AddressProvider.instance,

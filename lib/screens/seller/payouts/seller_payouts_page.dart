@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:trentify/currency/currency_controller.dart';
 import 'package:trentify/l10n/app_localizations.dart';
 import 'package:trentify/model/seller_settlement.dart';
 import 'package:trentify/provider/seller_provider.dart';
@@ -82,6 +84,15 @@ class _SellerPayoutsPageState extends State<SellerPayoutsPage> {
     }
   }
 
+  String _formatMoney(BuildContext context, double amount) {
+    try {
+      final ctl = context.watch<CurrencyController>();
+      return ctl.format(amount);
+    } catch (_) {
+      return '\$${amount.toStringAsFixed(2)}';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -91,6 +102,9 @@ class _SellerPayoutsPageState extends State<SellerPayoutsPage> {
     final borderColor = isDark ? const Color(0xFF30363D) : const Color(0xFFE2E8F0);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark ? const Color(0xFF8B949E) : const Color(0xFF64748B);
+    try {
+      context.watch<CurrencyController>();
+    } catch (_) {}
 
     final available = _seller.availableBalance;
     final inEscrow = _seller.escrowBalance;
@@ -379,7 +393,7 @@ class _SellerPayoutsPageState extends State<SellerPayoutsPage> {
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    '\$${available.toStringAsFixed(2)}',
+                    _formatMoney(context, available),
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w900,
@@ -455,7 +469,7 @@ class _SellerPayoutsPageState extends State<SellerPayoutsPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${inEscrow.toStringAsFixed(2)}',
+                      _formatMoney(context, inEscrow),
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
@@ -479,7 +493,7 @@ class _SellerPayoutsPageState extends State<SellerPayoutsPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${totalWithdrawn.toStringAsFixed(2)}',
+                      _formatMoney(context, totalWithdrawn),
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
@@ -692,10 +706,10 @@ class _SellerPayoutsPageState extends State<SellerPayoutsPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _feePill('Gross', '\$${settlement.grossAmount.toStringAsFixed(2)}', textSecondary),
-                _feePill('Fee (5%)', '-\$${settlement.platformFee.toStringAsFixed(2)}', primaryColor),
-                _feePill('Gateway (2.5%)', '-\$${settlement.paymentProcessingFee.toStringAsFixed(2)}', const Color(0xFFF59E0B)),
-                _feePill('Net', '\$${settlement.netAmount.toStringAsFixed(2)}', const Color(0xFF10B981), isBold: true),
+                _feePill('Gross', _formatMoney(context, settlement.grossAmount), textSecondary),
+                _feePill('Fee (5%)', '-${_formatMoney(context, settlement.platformFee)}', primaryColor),
+                _feePill('Gateway (2.5%)', '-${_formatMoney(context, settlement.paymentProcessingFee)}', const Color(0xFFF59E0B)),
+                _feePill('Net', _formatMoney(context, settlement.netAmount), const Color(0xFF10B981), isBold: true),
               ],
             ),
           ),
@@ -771,7 +785,7 @@ class _SellerPayoutsPageState extends State<SellerPayoutsPage> {
             ],
           ),
           Text(
-            '-\$${p.amount.toStringAsFixed(2)}',
+            '-${_formatMoney(context, p.amount)}',
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w900,
